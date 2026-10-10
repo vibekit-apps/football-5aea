@@ -14,7 +14,7 @@ export default function RootLayout() {
   const waking = useWakingState();
   return (
     <View style={{ flex: 1 }}>
-      <StatusBar style={waking ? 'light' : 'auto'} />
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }} />
       {waking && <WakingScreen state={waking} />}
     </View>

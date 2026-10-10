@@ -1,87 +1,11 @@
-// The first screen. A working example of the one pattern every screen uses:
-// load from this app's server with api() and show errors in words. While the
-// server wakes, the app's frame covers the screen on its own (app/_layout.tsx).
-// Replace it with the real app.
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../lib/api';
 
-type Item = { id: string; text: string; createdAt: string };
-
-export default function Home() {
-  const [items, setItems] = useState<Item[] | null>(null);
-  const [draft, setDraft] = useState('');
-  const [error, setError] = useState('');
-
-  const load = useCallback(async () => {
-    setError('');
-    try {
-      setItems(await api<Item[]>('GET', '/api/items'));
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const add = async () => {
-    const text = draft.trim();
-    if (!text) return;
-    setError('');
-    try {
-      const item = await api<Item>('POST', '/api/items', { text });
-      setItems((prev) => [item, ...(prev || [])]);
-      setDraft('');
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  };
-
-  return (
-    <SafeAreaView style={styles.screen}>
-      <Text style={styles.title}>My App</Text>
-      <View style={styles.row}>
-        <TextInput
-          style={styles.input}
-          value={draft}
-          onChangeText={setDraft}
-          onSubmitEditing={add}
-          placeholder="Add an item"
-          placeholderTextColor="#8a8aa0"
-          returnKeyType="done"
-        />
-        <Pressable style={styles.button} onPress={add} accessibilityRole="button" accessibilityLabel="Add">
-          <Ionicons name="add" size={24} color="#fff" />
-        </Pressable>
-      </View>
-      {!!error && (
-        <Pressable onPress={load} accessibilityRole="button">
-          <Text style={styles.error}>{error} Tap to retry.</Text>
-        </Pressable>
-      )}
-      {items === null && !error ? (
-        <ActivityIndicator style={{ marginTop: 32 }} />
-      ) : (
-        <FlatList
-          data={items || []}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => <Text style={styles.item}>{item.text}</Text>}
-          ListEmptyComponent={<Text style={styles.note}>Nothing yet. Add the first item.</Text>}
-        />
-      )}
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, paddingHorizontal: 20, backgroundColor: '#0f0f14' },
-  title: { fontSize: 28, fontWeight: '700', color: '#fff', marginTop: 16, marginBottom: 12 },
-  row: { flexDirection: 'row', gap: 10, marginBottom: 12 },
-  input: { flex: 1, backgroundColor: '#1c1c26', color: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16 },
-  button: { backgroundColor: '#7c5cff', borderRadius: 12, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center' },
-  item: { color: '#e8e8f0', fontSize: 17, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#2a2a36' },
-  note: { color: '#8a8aa0', fontSize: 15, marginVertical: 8 },
-  error: { color: '#f87171', fontSize: 15, marginVertical: 8 },
-});
+type Club={league:string;team:string;players:string[]}; type Shirt={id:string;league:string;team:string;player:string;kit:string;signature:string;match:string;importance:string;value:number;marketSource:string};
+const kitTypes=['Home kit','Away kit','Third kit']; const shirtTypes=['Normal','Print signed','Hand signed','Match used']; const importance=['Not important','Important','Very important'];
+export default function ShirtGame(){const[catalog,setCatalog]=useState<Club[]>([]);const[collection,setCollection]=useState<Shirt[]>([]);const[league,setLeague]=useState('');const[team,setTeam]=useState('');const[player,setPlayer]=useState('');const[kit,setKit]=useState('Home kit');const[signature,setSignature]=useState('Normal');const[match,setMatch]=useState('');const[importanceLevel,setImportance]=useState('Not important');const[saving,setSaving]=useState(false);useEffect(()=>{api<Club[]>('GET','/api/game/catalog').then(setCatalog);api<Shirt[]>('GET','/api/game/collection').then(setCollection)},[]);const leagues=useMemo(()=>[...new Set(catalog.map(x=>x.league))],[catalog]);const teams=catalog.filter(x=>x.league===league);const selected=teams.find(x=>x.team===team);const chooseLeague=(v:string)=>{setLeague(v);setTeam('');setPlayer('')};const chooseTeam=(v:string)=>{setTeam(v);setPlayer('')};const add=async()=>{if(!league||!team||!player){Alert.alert('Finish your selection','Choose a league, team and player first.');return}if(signature==='Match used'&&!match.trim()){Alert.alert('Name the match','Match-used shirts need a match.');return}setSaving(true);try{const shirt=await api<Shirt>('POST','/api/game/estimate',{league,team,player,kit,signature,match,importance:importanceLevel});setCollection(x=>[shirt,...x]);Alert.alert('Added to collection',`Estimated value: $${shirt.value}\n${shirt.marketSource}`)}catch(e){Alert.alert('Could not value shirt',(e as Error).message)}finally{setSaving(false)}};return <SafeAreaView style={s.screen} edges={['top']}><ScrollView contentContainerStyle={s.body}><View style={s.head}><View><Text style={s.eyebrow}>SHIRT MARKET GAME</Text><Text style={s.title}>Build your collection</Text></View><View style={s.counter}><Ionicons name="shirt-outline" size={20} color="#0f172a"/><Text style={s.counterText}>{collection.length}</Text></View></View><Text style={s.intro}>Pick a player shirt, choose its history, then reveal an estimated market value.</Text><Pick label="1. League" value={league} options={leagues} onPick={chooseLeague} placeholder="Choose a league"/><Pick label="2. Team" value={team} options={teams.map(x=>x.team)} onPick={chooseTeam} placeholder="Choose a team" disabled={!league}/><Pick label="3. Player" value={player} options={selected?.players||[]} onPick={setPlayer} placeholder="Choose a player" disabled={!team}/><Pick label="4. Kit" value={kit} options={kitTypes} onPick={setKit}/><Pick label="5. Shirt type" value={signature} options={shirtTypes} onPick={setSignature}/>{signature==='Match used'&&<><Text style={s.label}>Match</Text><TextInput value={match} onChangeText={setMatch} style={s.input} placeholder="e.g. Champions League final" placeholderTextColor="#64748b"/><Pick label="Match importance" value={importanceLevel} options={importance} onPick={setImportance}/></>}<View style={s.valueGuide}><Text style={s.guideTitle}>Value guide</Text><Text style={s.guide}>Normal is the cheapest. Print signed costs more, hand signed costs more again, and match used is the most valuable.</Text></View><Pressable style={s.reveal} onPress={add} accessibilityRole="button"><Text style={s.revealText}>{saving?'Checking listings…':'Reveal value & add shirt'}</Text></Pressable><Text style={s.section}>YOUR COLLECTION</Text>{collection.length?collection.map(x=><View key={x.id} style={s.card}><View style={s.shirtIcon}><Ionicons name="shirt-outline" size={28} color="#38bdf8"/></View><View style={{flex:1}}><Text style={s.player}>{x.player}</Text><Text style={s.detail}>{x.team} · {x.kit}</Text><Text style={s.detail}>{x.signature}{x.match?` · ${x.match}`:''}</Text></View><Text style={s.price}>${x.value}</Text></View>):<Text style={s.empty}>Your selected shirts will appear here.</Text>}</ScrollView></SafeAreaView>}
+function Pick({label,value,options,onPick,placeholder,disabled}:any){return <View style={[s.pickGroup,disabled&&s.disabled]}><Text style={s.label}>{label}</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.options}>{options.length?options.map((x:string)=><Pressable key={x} style={[s.option,value===x&&s.selected]} onPress={()=>onPick(x)} disabled={disabled} accessibilityRole="button"><Text style={[s.optionText,value===x&&s.selectedText]}>{x}</Text></Pressable>):<Text style={s.placeholder}>{placeholder}</Text>}</ScrollView></View>}
+const s=StyleSheet.create({screen:{flex:1,backgroundColor:'#0f172a'},body:{padding:20,paddingBottom:46},head:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},eyebrow:{color:'#38bdf8',fontWeight:'800',fontSize:11,letterSpacing:1.7},title:{color:'#e2e8f0',fontSize:29,fontWeight:'800',marginTop:3},counter:{height:42,minWidth:42,paddingHorizontal:11,borderRadius:22,backgroundColor:'#38bdf8',flexDirection:'row',alignItems:'center',justifyContent:'center',gap:4},counterText:{fontWeight:'900',color:'#0f172a'},intro:{color:'#94a3b8',lineHeight:21,fontSize:15,marginTop:18,marginBottom:9},pickGroup:{marginTop:14},disabled:{opacity:.5},label:{color:'#e2e8f0',fontSize:14,fontWeight:'800',marginBottom:8},options:{gap:8,paddingRight:20},option:{borderWidth:1,borderColor:'#475569',borderRadius:99,paddingVertical:10,paddingHorizontal:14,backgroundColor:'#162338'},selected:{backgroundColor:'#38bdf8',borderColor:'#38bdf8'},optionText:{color:'#cbd5e1',fontWeight:'700'},selectedText:{color:'#0f172a'},placeholder:{color:'#64748b',paddingVertical:10},input:{backgroundColor:'#162338',borderWidth:1,borderColor:'#334155',borderRadius:12,padding:14,color:'#e2e8f0',fontSize:16},valueGuide:{marginTop:22,backgroundColor:'#162338',borderRadius:14,borderWidth:1,borderColor:'#334155',padding:14},guideTitle:{color:'#38bdf8',fontWeight:'800',fontSize:13},guide:{color:'#cbd5e1',lineHeight:20,fontSize:14,marginTop:5},reveal:{backgroundColor:'#38bdf8',padding:17,alignItems:'center',borderRadius:13,marginTop:18},revealText:{color:'#0f172a',fontWeight:'900',fontSize:16},section:{color:'#38bdf8',fontWeight:'800',fontSize:12,letterSpacing:1.4,marginTop:30,marginBottom:10},card:{backgroundColor:'#162338',borderRadius:14,padding:12,flexDirection:'row',alignItems:'center',gap:11,marginBottom:9},shirtIcon:{height:48,width:48,borderRadius:10,alignItems:'center',justifyContent:'center',backgroundColor:'#0c1b2f'},player:{color:'#e2e8f0',fontSize:16,fontWeight:'800'},detail:{color:'#94a3b8',fontSize:12,marginTop:3},price:{color:'#38bdf8',fontSize:19,fontWeight:'900'},empty:{color:'#64748b',fontSize:15}});

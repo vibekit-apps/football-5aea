@@ -37,14 +37,56 @@ const MIME = {
 const routes = {
   'GET /health': (req, res) => json(res, { status: 'ok', uptime: process.uptime(), release: currentRelease() }),
 
-  // Example data. Replace with your app's own.
-  'GET /api/items': (req, res) => json(res, store.read('items')),
-  'POST /api/items': async (req, res) => {
-    const { text } = await readBody(req);
-    if (!text || !String(text).trim()) return json(res, { error: 'Write something first' }, 400);
-    const item = { id: crypto.randomUUID(), text: String(text).trim().slice(0, 500), createdAt: new Date().toISOString() };
-    store.write('items', [item, ...store.read('items')]);
-    json(res, item, 201);
+  'GET /api/game/catalog': (req, res) => json(res, GAME_CATALOG),
+  'POST /api/game/estimate': async (req, res) => {
+    const { league, team, player, kit, signature, match, importance } = await readBody(req);
+    if (!league || !team || !player || !kit || !signature) return json(res, { error: 'Choose a league, team, player, kit and shirt type.' }, 400);
+    const query = `${player} ${team} ${kit} football shirt ${signature === 'Normal' ? '' : signature}`.trim();
+    const listing = await marketEstimate(query);
+    const multiplier = signature === 'Match used' ? (importance === 'Very important' ? 3.5 : importance === 'Important' ? 2.4 : 1.65) : signature === 'Hand signed' ? 1.75 : signature === 'Print signed' ? 1.25 : 1;
+    const value = Math.max(20, Math.round((listing.price || 55) * multiplier));
+    const shirt = { id: crypto.randomUUID(), league, team, player, kit, signature, match: signature === 'Match used' ? String(match || '').slice(0, 120) : '', importance: signature === 'Match used' ? importance : '', value, marketSource: listing.source, createdAt: new Date().toISOString() };
+    store.write('collection', [shirt, ...store.read('collection')]);
+    json(res, shirt, 201);
+  },
+  'GET /api/game/collection': (req, res) => json(res, store.read('collection')),
+  'GET /api/shirts': (req, res) => {
+    const shirts = store.read('shirts');
+    json(res, shirts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+  },
+  'GET /api/shirts/stats': (req, res) => {
+    const shirts = store.read('shirts');
+    const byClub = shirts.reduce((groups, shirt) => {
+      groups[shirt.club] = (groups[shirt.club] || 0) + 1;
+      return groups;
+    }, {});
+    const bySeason = shirts.reduce((groups, shirt) => {
+      groups[shirt.season] = (groups[shirt.season] || 0) + 1;
+      return groups;
+    }, {});
+    json(res, { total: shirts.length, byClub, bySeason });
+  },
+  'GET /api/shirts/:id': () => {},
+  'POST /api/shirts': async (req, res) => {
+    const body = await readBody(req);
+    const name = String(body.name || '').trim();
+    const club = String(body.club || '').trim();
+    const season = String(body.season || '').trim();
+    const condition = String(body.condition || '').trim();
+    if (!name || !club || !season || !condition) return json(res, { error: 'Add a shirt name, club, season and condition.' }, 400);
+    const shirt = {
+      id: crypto.randomUUID(), name: name.slice(0, 80), club: club.slice(0, 80), season: season.slice(0, 24),
+      condition: condition.slice(0, 30), photoUrl: String(body.photoUrl || '').trim().slice(0, 1000),
+      notes: String(body.notes || '').trim().slice(0, 500), createdAt: new Date().toISOString(),
+    };
+    store.write('shirts', [shirt, ...store.read('shirts')]);
+    json(res, shirt, 201);
+  },
+  'DELETE /api/shirts': async (req, res) => {
+    const { id } = await readBody(req);
+    if (!id) return json(res, { error: 'Missing shirt id.' }, 400);
+    store.write('shirts', store.read('shirts').filter((shirt) => shirt.id !== id));
+    json(res, { ok: true });
   },
 
   // Accounts (lib/auth.js). The app keeps the returned token (lib/api.ts).
@@ -60,6 +102,28 @@ const routes = {
     return user ? json(res, { user }) : json(res, { error: 'Not signed in' }, 401);
   },
 };
+
+const GAME_CATALOG = [
+  { league: 'Premier League', team: 'Arsenal', players: ['Bukayo Saka', 'Martin Ødegaard', 'Declan Rice'] },
+  { league: 'Premier League', team: 'Liverpool', players: ['Mohamed Salah', 'Virgil van Dijk', 'Alisson Becker'] },
+  { league: 'Premier League', team: 'Manchester City', players: ['Erling Haaland', 'Phil Foden', 'Rodri'] },
+  { league: 'La Liga', team: 'Real Madrid', players: ['Kylian Mbappé', 'Jude Bellingham', 'Vinícius Júnior'] },
+  { league: 'La Liga', team: 'Barcelona', players: ['Lamine Yamal', 'Robert Lewandowski', 'Pedri'] },
+  { league: 'Serie A', team: 'Inter Milan', players: ['Lautaro Martínez', 'Nicolò Barella', 'Alessandro Bastoni'] },
+  { league: 'Serie A', team: 'Juventus', players: ['Dušan Vlahović', 'Kenan Yıldız', 'Manuel Locatelli'] },
+  { league: 'Bundesliga', team: 'Bayern Munich', players: ['Harry Kane', 'Jamal Musiala', 'Manuel Neuer'] },
+  { league: 'Ligue 1', team: 'Paris Saint-Germain', players: ['Ousmane Dembélé', 'Achraf Hakimi', 'Marquinhos'] },
+];
+
+async function marketEstimate(query) {
+  try {
+    const response = await fetch(`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&_sacat=0`, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(6000) });
+    const html = await response.text();
+    const prices = [...html.matchAll(/(?:US \$|\$)(\d{1,5}(?:\.\d{2})?)/g)].map((m) => Number(m[1])).filter((price) => price >= 15 && price <= 10000).slice(0, 20).sort((a, b) => a - b);
+    if (prices.length) return { price: prices[Math.floor(prices.length / 2)], source: 'eBay listing median' };
+  } catch { /* market lookup is best-effort */ }
+  return { price: 55, source: 'Starter estimate — live listings unavailable' };
+}
 
 function json(res, data, status = 200, headers = {}) {
   const payload = JSON.stringify(data);
