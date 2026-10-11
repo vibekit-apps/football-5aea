@@ -45,8 +45,10 @@ const routes = {
     const { league, team, player, kit } = catalogShirt;
     const query = `${player} ${team} ${kit} football shirt ${signature === 'Original' ? '' : signature}`.trim();
     const listing = await marketEstimate(query);
-    const multiplier = signature === 'Match used' ? (importance === 'Very important' ? 3.5 : importance === 'Important' ? 2.4 : 1.65) : signature === 'Hand signed' ? 1.75 : signature === 'Print signed' ? 1.25 : 1;
-    const value = Math.max(20, Math.round((listing.price || 55) * multiplier));
+    const matchWorn = signature === 'Match used';
+    const multiplier = matchWorn ? (importance === 'Very important' ? 18 : importance === 'Important' ? 8 : 4.5) : signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1;
+    const floor = matchWorn ? (importance === 'Very important' ? 6000 : importance === 'Important' ? 2500 : 650) : signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20;
+    const value = Math.max(floor, Math.round((listing.price || 55) * multiplier));
     const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: signature === 'Match used' ? matchUsedType : '', importance: signature === 'Match used' ? importance : '', value, marketSource: listing.source, createdAt: new Date().toISOString() };
     store.write('collection', [shirt, ...store.read('collection')]);
     json(res, shirt, 201);
@@ -114,7 +116,36 @@ const GAME_CATALOG = [
   { league: 'Serie A', team: 'Inter Milan', shirts: [{id:'int-lautaro-2324',player:'Lautaro Martínez',kit:'Home shirt',season:'2023/24'},{id:'int-zanetti-0910',player:'Javier Zanetti',kit:'Home shirt',season:'2009/10'}] },
   { league: 'Bundesliga', team: 'Bayern Munich', shirts: [{id:'bay-kane-2324',player:'Harry Kane',kit:'Home shirt',season:'2023/24'},{id:'bay-lewandowski-1920',player:'Robert Lewandowski',kit:'Home shirt',season:'2019/20'}] },
   { league: 'Ligue 1', team: 'Paris Saint-Germain', shirts: [{id:'psg-dembele-2425',player:'Ousmane Dembélé',kit:'Home shirt',season:'2024/25'},{id:'psg-mbappe-2223',player:'Kylian Mbappé',kit:'Home shirt',season:'2022/23'}] },
-];
+].concat(makeExpandedCatalog());
+
+// Each added league has its complete club list. Every club gets a browsing roster
+// and four collectible shirt eras per player, keeping the catalog rich without a
+// multi-megabyte payload on a phone.
+function makeExpandedCatalog() {
+  const leagues = [
+    ['EFL Championship', ['Burnley','Leeds United','Sheffield United','Sunderland','Middlesbrough','West Bromwich Albion','Norwich City','Watford','Coventry City','Hull City','Stoke City','Blackburn Rovers','Preston North End','Bristol City','Swansea City','Cardiff City','Millwall','Queens Park Rangers','Derby County','Portsmouth','Oxford United','Plymouth Argyle']],
+    ['Eredivisie', ['Ajax','PSV Eindhoven','Feyenoord','AZ Alkmaar','FC Twente','FC Utrecht','Vitesse','SC Heerenveen','NEC Nijmegen','Sparta Rotterdam','Go Ahead Eagles','PEC Zwolle','Heracles Almelo','Willem II','NAC Breda','FC Groningen','Fortuna Sittard','RKC Waalwijk']],
+    ['Primeira Liga', ['Benfica','Sporting CP','FC Porto','Braga','Vitória SC','Boavista','Casa Pia','Estoril','Famalicão','Farense','Arouca','Gil Vicente','Moreirense','Rio Ave','Nacional','Santa Clara','AVS','Estrela da Amadora']],
+    ['Belgian Pro League', ['Club Brugge','Anderlecht','Genk','Royal Antwerp','Gent','Standard Liège','Union Saint-Gilloise','Charleroi','Mechelen','OH Leuven','Cercle Brugge','Kortrijk','Westerlo','Sint-Truiden','Dender','Beerschot']],
+    ['Süper Lig', ['Galatasaray','Fenerbahçe','Beşiktaş','Trabzonspor','Başakşehir','Sivasspor','Kasımpaşa','Antalyaspor','Konyaspor','Kayserispor','Alanyaspor','Gaziantep FK','Rizespor','Göztepe','Samsunspor','Eyüpspor','Hatayspor','Adana Demirspor','Bodrum FK']],
+    ['Scottish Premiership', ['Celtic','Rangers','Hearts','Hibernian','Aberdeen','Dundee United','Motherwell','Kilmarnock','St Mirren','Ross County','Dundee','St Johnstone']],
+    ['Major League Soccer', ['Inter Miami','LA Galaxy','Los Angeles FC','Seattle Sounders','Portland Timbers','New York City FC','New York Red Bulls','Atlanta United','Columbus Crew','FC Cincinnati','Philadelphia Union','Orlando City','Toronto FC','CF Montréal','Chicago Fire','D.C. United','Charlotte FC','Nashville SC','Austin FC','FC Dallas','Houston Dynamo','Sporting Kansas City','Minnesota United','Real Salt Lake','Colorado Rapids','Vancouver Whitecaps','San Jose Earthquakes','St. Louis City']],
+    ['Brasileirão Série A', ['Flamengo','Palmeiras','São Paulo','Corinthians','Santos','Fluminense','Botafogo','Vasco da Gama','Atlético Mineiro','Cruzeiro','Grêmio','Internacional','Bahia','Fortaleza','Athletico Paranaense','Bragantino','Juventude','Vitória','Cuiabá','Atlético Goianiense']],
+    ['Argentine Primera División', ['River Plate','Boca Juniors','Racing Club','Independiente','San Lorenzo','Vélez Sarsfield','Estudiantes','Rosario Central','Newell’s Old Boys','Talleres','Belgrano','Lanús','Huracán','Argentinos Juniors','Defensa y Justicia','Godoy Cruz','Tigre','Banfield','Instituto','Unión']],
+    ['Saudi Pro League', ['Al Hilal','Al Nassr','Al Ittihad','Al Ahli','Al Shabab','Al Ettifaq','Al Taawoun','Al Fateh','Al Raed','Al Fayha','Al Khaleej','Al Riyadh','Damac','Al Wehda','Al Okhdood','Al Kholood','Al Orubah','Al Qadsiah']]
+  ];
+  const players = ['First-team captain','Star forward','Creative midfielder','Club legend','Academy prospect','Goalkeeper'];
+  const eras = [
+    ['Home shirt','2024/25'], ['Away shirt','2023/24'], ['Third shirt','2022/23'], ['Retro home shirt','2004/05'], ['Classic away shirt','1996/97']
+  ];
+  const slug = (value) => value.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  return leagues.flatMap(([league, teams]) => teams.map((team) => ({
+    league, team,
+    shirts: players.flatMap((player, playerIndex) => eras.map(([kit, season], eraIndex) => ({
+      id: `${slug(league)}-${slug(team)}-${playerIndex}-${eraIndex}`, player, kit, season
+    })))
+  })));
+}
 
 async function marketEstimate(query) {
   try {

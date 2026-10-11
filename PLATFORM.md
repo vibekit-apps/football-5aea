@@ -29,7 +29,7 @@
 - **Credits** pay for AI when using VibeKit's built-in models. At $0 the agent pauses until top-up (the app itself stays live).
 - **BYOK**: connect an **Anthropic** account (Claude API key or claude.ai sign-in) or **OpenAI** account (API key or ChatGPT sign-in) — AI then runs directly on the user's own account: no VibeKit AI charges, no markup, unlimited sessions. Set in **iOS: Profile tab · web: Settings → AI**.
 - **Free AI** option: a rotating pool of free models, $0, no key needed.
-- **Generated media**, billed from credits (image ~4¢ to ~20¢, music ~10¢ per track, depending on the model; video: exact prices per length from generate-video called without `duration`). An OpenAI **API key** generates images on the user's own OpenAI account at no VibeKit charge; every other account (no key, an Anthropic key, a ChatGPT sign-in) generates images on VibeKit credits. The image and video models are picked in the AI model drawer's Images and Video tabs, newest by default. Music and video always bill credits.
+- **Generated media**, billed from credits (image ~3¢ to ~17¢, music ~8¢ per track, depending on the model; video: exact prices per length from generate-video called without `duration`). An OpenAI **API key** generates images on the user's own OpenAI account at no VibeKit charge; every other account (no key, an Anthropic key, a ChatGPT sign-in) generates images on VibeKit credits. The image and video models are picked in the AI model drawer's Images and Video tabs, newest by default. Music and video always bill credits.
 
 ## Where users tap (iOS app / web dashboard)
 When a user asks WHERE something is ("how do I publish", "where's the deploy button"), answer from these exact locations — never guess or improvise UI directions:
