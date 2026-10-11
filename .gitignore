@@ -45,6 +45,7 @@ dist-export/
 lib/data/
 !lib/data/
 !lib/data/premier-league-2026-27.json
+!lib/data/current-squads-2026-27.json
 
 # VibeKit internal v6 — agent state, never deployed
 .openclaw/

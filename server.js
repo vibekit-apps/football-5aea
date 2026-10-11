@@ -18,7 +18,7 @@ const path = require('path');
 const crypto = require('crypto');
 const store = require('./lib/store');
 const auth = require('./lib/auth');
-const PREMIER_LEAGUE_2026_27 = require('./lib/data/premier-league-2026-27.json');
+const CURRENT_SQUADS_2026_27 = require('./lib/data/current-squads-2026-27.json');
 
 const PORT = process.env.PORT || 3000;
 const DIST = path.join(__dirname, 'dist');
@@ -114,16 +114,9 @@ const routes = {
   },
 };
 
-const GAME_CATALOG = [
-  { league: 'Premier League', team: 'Arsenal', shirts: [{id:'ars-saka-2425',player:'Bukayo Saka',kit:'Home shirt',season:'2024/25'},{id:'ars-odegaard-2324',player:'Martin Ødegaard',kit:'Home shirt',season:'2023/24'},{id:'ars-henry-0405',player:'Thierry Henry',kit:'Home shirt',season:'2004/05'}] },
-  { league: 'Premier League', team: 'Liverpool', shirts: [{id:'liv-salah-2425',player:'Mohamed Salah',kit:'Home shirt',season:'2024/25'},{id:'liv-vvd-1920',player:'Virgil van Dijk',kit:'Home shirt',season:'2019/20'},{id:'liv-gerrard-0506',player:'Steven Gerrard',kit:'Home shirt',season:'2005/06'}] },
-  { league: 'Premier League', team: 'Manchester City', shirts: [{id:'mci-haaland-2324',player:'Erling Haaland',kit:'Home shirt',season:'2023/24'},{id:'mci-foden-2324',player:'Phil Foden',kit:'Home shirt',season:'2023/24'},{id:'mci-aguero-1112',player:'Sergio Agüero',kit:'Home shirt',season:'2011/12'}] },
-  { league: 'La Liga', team: 'Real Madrid', shirts: [{id:'rma-mbappe-2425',player:'Kylian Mbappé',kit:'Home shirt',season:'2024/25'},{id:'rma-bellingham-2324',player:'Jude Bellingham',kit:'Home shirt',season:'2023/24'},{id:'rma-zidane-0102',player:'Zinedine Zidane',kit:'Home shirt',season:'2001/02'}] },
-  { league: 'La Liga', team: 'Barcelona', shirts: [{id:'bar-yamal-2425',player:'Lamine Yamal',kit:'Home shirt',season:'2024/25'},{id:'bar-messi-1011',player:'Lionel Messi',kit:'Home shirt',season:'2010/11'},{id:'bar-iniesta-0809',player:'Andrés Iniesta',kit:'Home shirt',season:'2008/09'}] },
-  { league: 'Serie A', team: 'Inter Milan', shirts: [{id:'int-lautaro-2324',player:'Lautaro Martínez',kit:'Home shirt',season:'2023/24'},{id:'int-zanetti-0910',player:'Javier Zanetti',kit:'Home shirt',season:'2009/10'}] },
-  { league: 'Bundesliga', team: 'Bayern Munich', shirts: [{id:'bay-kane-2324',player:'Harry Kane',kit:'Home shirt',season:'2023/24'},{id:'bay-lewandowski-1920',player:'Robert Lewandowski',kit:'Home shirt',season:'2019/20'}] },
-  { league: 'Ligue 1', team: 'Paris Saint-Germain', shirts: [{id:'psg-dembele-2425',player:'Ousmane Dembélé',kit:'Home shirt',season:'2024/25'},{id:'psg-mbappe-2223',player:'Kylian Mbappé',kit:'Home shirt',season:'2022/23'}] },
-].filter((club) => club.league !== 'Premier League').concat(PREMIER_LEAGUE_2026_27, makeExpandedCatalog().filter((club) => !['La Liga','Serie A','Bundesliga','Ligue 1'].includes(club.league)));
+// Officially listed squad data for the 2026/27 and 2025/26 seasons. A player
+// appears only with the club they represented in the shirt's listed season.
+const GAME_CATALOG = CURRENT_SQUADS_2026_27;
 
 // Each added league has its complete club list. Every club gets a browsing roster
 // and four collectible shirt eras per player, keeping the catalog rich without a
