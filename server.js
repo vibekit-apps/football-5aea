@@ -130,15 +130,15 @@ function estimateShirtValue({ player, signature, matchUsedType, importance, base
   // Special rule: Messi's iconic 2017 Barca vs Madrid home shirt worth 400k only when exact phrase entered
   const momentPhrase = (match || '').toLowerCase();
   const isExactMoment = momentPhrase.includes('barca vs madrid classic') && momentPhrase.includes('messi shirt');
-  if (player === 'Lionel Messi' && signature === 'Match used' && season === '2017' && isExactMoment) {
-    return Math.round(base * 400000);
+  if (player === 'Lionel Messi' && signature === 'Match used' && season && season.startsWith('2017') && isExactMoment) {
+    return 400000;
   }
   if (signature !== 'Match used') {
     return Math.max(signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20, Math.round(base * (signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1)));
   }
   const tier = playerTier(player);
   const competition = { 'Club friendly': 1, 'League match': 4, 'Cup match': 7, 'Champions League match': 13, 'International match': 11 }[matchUsedType] || 4;
-  const occasion = { 'Standard match': 1, 'Knockout match': 2.4, 'Final': 5.5, 'Rivalry / derby': 7 }[importance] || 1;
+  const occasion = { 'Not important': 1, 'Little important': 1.8, 'Important': 3, 'Rivalry': 5.5, 'Really important': 8 }[importance] || 1;
   const floor = Math.round(450 * competition * occasion * (1 + tier * 0.45));
   return Math.max(floor, Math.round(base * competition * occasion * (1 + tier * 0.45)));
 }
