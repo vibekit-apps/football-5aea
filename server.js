@@ -18,6 +18,7 @@ const path = require('path');
 const crypto = require('crypto');
 const store = require('./lib/store');
 const auth = require('./lib/auth');
+const PREMIER_LEAGUE_2026_27 = require('./lib/data/premier-league-2026-27.json');
 
 const PORT = process.env.PORT || 3000;
 const DIST = path.join(__dirname, 'dist');
@@ -116,14 +117,14 @@ const GAME_CATALOG = [
   { league: 'Serie A', team: 'Inter Milan', shirts: [{id:'int-lautaro-2324',player:'Lautaro Martínez',kit:'Home shirt',season:'2023/24'},{id:'int-zanetti-0910',player:'Javier Zanetti',kit:'Home shirt',season:'2009/10'}] },
   { league: 'Bundesliga', team: 'Bayern Munich', shirts: [{id:'bay-kane-2324',player:'Harry Kane',kit:'Home shirt',season:'2023/24'},{id:'bay-lewandowski-1920',player:'Robert Lewandowski',kit:'Home shirt',season:'2019/20'}] },
   { league: 'Ligue 1', team: 'Paris Saint-Germain', shirts: [{id:'psg-dembele-2425',player:'Ousmane Dembélé',kit:'Home shirt',season:'2024/25'},{id:'psg-mbappe-2223',player:'Kylian Mbappé',kit:'Home shirt',season:'2022/23'}] },
-].concat(makeExpandedCatalog());
+].filter((club) => club.league !== 'Premier League').concat(PREMIER_LEAGUE_2026_27, makeExpandedCatalog());
 
 // Each added league has its complete club list. Every club gets a browsing roster
 // and four collectible shirt eras per player, keeping the catalog rich without a
 // multi-megabyte payload on a phone.
 function makeExpandedCatalog() {
   const leagues = [
-    ['EFL Championship', ['Burnley','Leeds United','Sheffield United','Sunderland','Middlesbrough','West Bromwich Albion','Norwich City','Watford','Coventry City','Hull City','Stoke City','Blackburn Rovers','Preston North End','Bristol City','Swansea City','Cardiff City','Millwall','Queens Park Rangers','Derby County','Portsmouth','Oxford United','Plymouth Argyle']],
+    ['EFL Championship', ['Birmingham City','Blackburn Rovers','Bolton Wanderers','Bristol City','Burnley','Cardiff City','Charlton Athletic','Derby County','Lincoln City','Middlesbrough','Millwall','Norwich City','Portsmouth','Preston North End','Queens Park Rangers','Sheffield United','Southampton','Stoke City','Swansea City','Watford','West Bromwich Albion','West Ham United','Wolverhampton Wanderers']],
     ['Eredivisie', ['Ajax','PSV Eindhoven','Feyenoord','AZ Alkmaar','FC Twente','FC Utrecht','Vitesse','SC Heerenveen','NEC Nijmegen','Sparta Rotterdam','Go Ahead Eagles','PEC Zwolle','Heracles Almelo','Willem II','NAC Breda','FC Groningen','Fortuna Sittard','RKC Waalwijk']],
     ['Primeira Liga', ['Benfica','Sporting CP','FC Porto','Braga','Vitória SC','Boavista','Casa Pia','Estoril','Famalicão','Farense','Arouca','Gil Vicente','Moreirense','Rio Ave','Nacional','Santa Clara','AVS','Estrela da Amadora']],
     ['Belgian Pro League', ['Club Brugge','Anderlecht','Genk','Royal Antwerp','Gent','Standard Liège','Union Saint-Gilloise','Charleroi','Mechelen','OH Leuven','Cercle Brugge','Kortrijk','Westerlo','Sint-Truiden','Dender','Beerschot']],
@@ -136,7 +137,7 @@ function makeExpandedCatalog() {
   ];
   const players = ['First-team captain','Star forward','Creative midfielder','Club legend','Academy prospect','Goalkeeper'];
   const eras = [
-    ['Home shirt','2024/25'], ['Away shirt','2023/24'], ['Third shirt','2022/23'], ['Retro home shirt','2004/05'], ['Classic away shirt','1996/97']
+    ['Home shirt','2026/27'], ['Away shirt','2026/27'], ['Home shirt','2025/26'], ['Away shirt','2025/26'], ['Third shirt','2024/25'], ['Retro home shirt','2004/05'], ['Classic away shirt','1996/97']
   ];
   const slug = (value) => value.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   return leagues.flatMap(([league, teams]) => teams.map((team) => ({
