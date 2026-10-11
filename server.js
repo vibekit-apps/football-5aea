@@ -55,6 +55,12 @@ const routes = {
     json(res, shirt, 201);
   },
   'GET /api/game/collection': (req, res) => json(res, store.read('collection')),
+  'DELETE /api/game/collection': async (req, res) => {
+    const { id } = await readBody(req);
+    if (!id) return json(res, { error: 'Missing collection shirt id.' }, 400);
+    store.write('collection', store.read('collection').filter((shirt) => shirt.id !== id));
+    json(res, { ok: true });
+  },
   'GET /api/shirts': (req, res) => {
     const shirts = store.read('shirts');
     json(res, shirts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -117,13 +123,17 @@ const GAME_CATALOG = [
   { league: 'Serie A', team: 'Inter Milan', shirts: [{id:'int-lautaro-2324',player:'Lautaro Martínez',kit:'Home shirt',season:'2023/24'},{id:'int-zanetti-0910',player:'Javier Zanetti',kit:'Home shirt',season:'2009/10'}] },
   { league: 'Bundesliga', team: 'Bayern Munich', shirts: [{id:'bay-kane-2324',player:'Harry Kane',kit:'Home shirt',season:'2023/24'},{id:'bay-lewandowski-1920',player:'Robert Lewandowski',kit:'Home shirt',season:'2019/20'}] },
   { league: 'Ligue 1', team: 'Paris Saint-Germain', shirts: [{id:'psg-dembele-2425',player:'Ousmane Dembélé',kit:'Home shirt',season:'2024/25'},{id:'psg-mbappe-2223',player:'Kylian Mbappé',kit:'Home shirt',season:'2022/23'}] },
-].filter((club) => club.league !== 'Premier League').concat(PREMIER_LEAGUE_2026_27, makeExpandedCatalog());
+].filter((club) => !['Premier League','La Liga','Serie A','Bundesliga','Ligue 1'].includes(club.league)).concat(PREMIER_LEAGUE_2026_27, makeExpandedCatalog());
 
 // Each added league has its complete club list. Every club gets a browsing roster
 // and four collectible shirt eras per player, keeping the catalog rich without a
 // multi-megabyte payload on a phone.
 function makeExpandedCatalog() {
   const leagues = [
+    ['La Liga', ['Athletic Club','Atlético Madrid','Barcelona','Celta Vigo','Elche','Espanyol','Getafe','Girona','Levante','Mallorca','Osasuna','Rayo Vallecano','Real Betis','Real Madrid','Real Oviedo','Real Sociedad','Sevilla','Valencia','Villarreal']],
+    ['Serie A', ['AC Milan','Atalanta','Bologna','Cagliari','Como','Cremonese','Fiorentina','Genoa','Hellas Verona','Inter Milan','Juventus','Lazio','Lecce','Napoli','Parma','Pisa','Roma','Sassuolo','Torino','Udinese']],
+    ['Bundesliga', ['Bayern Munich','Borussia Dortmund','Borussia Mönchengladbach','Bayer Leverkusen','Eintracht Frankfurt','FC Augsburg','FC Cologne','FC Heidenheim','Freiburg','Hamburg','Hoffenheim','Mainz 05','RB Leipzig','St Pauli','Union Berlin','VfL Wolfsburg','VfB Stuttgart','Werder Bremen']],
+    ['Ligue 1', ['AJ Auxerre','Angers','AS Monaco','Brest','Le Havre','Lens','Lille','Lorient','Lyon','Marseille','Metz','Nantes','Nice','Paris FC','Paris Saint-Germain','Rennes','Strasbourg','Toulouse']],
     ['EFL Championship', ['Birmingham City','Blackburn Rovers','Bolton Wanderers','Bristol City','Burnley','Cardiff City','Charlton Athletic','Derby County','Lincoln City','Middlesbrough','Millwall','Norwich City','Portsmouth','Preston North End','Queens Park Rangers','Sheffield United','Southampton','Stoke City','Swansea City','Watford','West Bromwich Albion','West Ham United','Wolverhampton Wanderers']],
     ['Eredivisie', ['Ajax','PSV Eindhoven','Feyenoord','AZ Alkmaar','FC Twente','FC Utrecht','Vitesse','SC Heerenveen','NEC Nijmegen','Sparta Rotterdam','Go Ahead Eagles','PEC Zwolle','Heracles Almelo','Willem II','NAC Breda','FC Groningen','Fortuna Sittard','RKC Waalwijk']],
     ['Primeira Liga', ['Benfica','Sporting CP','FC Porto','Braga','Vitória SC','Boavista','Casa Pia','Estoril','Famalicão','Farense','Arouca','Gil Vicente','Moreirense','Rio Ave','Nacional','Santa Clara','AVS','Estrela da Amadora']],
@@ -135,7 +145,7 @@ function makeExpandedCatalog() {
     ['Argentine Primera División', ['River Plate','Boca Juniors','Racing Club','Independiente','San Lorenzo','Vélez Sarsfield','Estudiantes','Rosario Central','Newell’s Old Boys','Talleres','Belgrano','Lanús','Huracán','Argentinos Juniors','Defensa y Justicia','Godoy Cruz','Tigre','Banfield','Instituto','Unión']],
     ['Saudi Pro League', ['Al Hilal','Al Nassr','Al Ittihad','Al Ahli','Al Shabab','Al Ettifaq','Al Taawoun','Al Fateh','Al Raed','Al Fayha','Al Khaleej','Al Riyadh','Damac','Al Wehda','Al Okhdood','Al Kholood','Al Orubah','Al Qadsiah']]
   ];
-  const players = ['First-team captain','Star forward','Creative midfielder','Club legend','Academy prospect','Goalkeeper'];
+  const players = ['Álvaro Morata','Antoine Griezmann','Lautaro Martínez','Rafael Leão','Victor Osimhen','Khvicha Kvaratskhelia','Jamal Musiala','Florian Wirtz','Ousmane Dembélé','Bradley Barcola','Nico Williams','Pedri','Federico Valverde','Jude Bellingham','Harry Kane','Michael Olise','Viktor Gyökeres','João Neves','Achraf Hakimi','Mike Maignan','Gianluigi Donnarumma','Thibaut Courtois'];
   const eras = [
     ['Home shirt','2026/27'], ['Away shirt','2026/27'], ['Home shirt','2025/26'], ['Away shirt','2025/26'], ['Third shirt','2024/25'], ['Retro home shirt','2004/05'], ['Classic away shirt','1996/97']
   ];
