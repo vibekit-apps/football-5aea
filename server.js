@@ -40,7 +40,7 @@ const routes = {
 
   'GET /api/game/catalog': (req, res) => json(res, GAME_CATALOG),
   'POST /api/game/estimate': async (req, res) => {
-    const { shirtId, signature, matchUsedType, importance } = await readBody(req);
+    const { shirtId, signature, matchUsedType, importance, match } = await readBody(req);
     const catalogShirt = GAME_CATALOG.flatMap((club) => club.shirts.map((shirt) => ({ ...shirt, league: club.league, team: club.team }))).find((shirt) => shirt.id === shirtId);
     if (!catalogShirt || !signature) return json(res, { error: 'Select a shirt and its version.' }, 400);
     const { league, team, player, kit } = catalogShirt;
@@ -48,9 +48,10 @@ const routes = {
     const listing = await marketEstimate(query);
     const matchWorn = signature === 'Match used';
     const multiplier = matchWorn ? (importance === 'Very important' ? 18 : importance === 'Important' ? 8 : 4.5) : signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1;
-    const floor = matchWorn ? (importance === 'Very important' ? 6000 : importance === 'Important' ? 2500 : 650) : signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20;
-    const value = Math.max(floor, Math.round((listing.price || 55) * multiplier));
-    const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: signature === 'Match used' ? matchUsedType : '', importance: signature === 'Match used' ? importance : '', value, marketSource: listing.source, createdAt: new Date().toISOString() };
+    const star = /neymar|messi|ronaldo|mbappé|mbappe|lamine yamal/i.test(player);
+    const floor = matchWorn ? (importance === 'Very important' ? (star ? 15000 : 6000) : importance === 'Important' ? (star ? 7000 : 2500) : (star ? 2500 : 650)) : signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20;
+    const value = Math.max(floor, Math.round((listing.price || 55) * multiplier * (star && matchWorn ? 2.5 : 1)));
+    const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: matchWorn ? matchUsedType : '', importance: matchWorn ? importance : '', match: matchWorn ? String(match || '').trim().slice(0, 120) : '', value, marketSource: `${listing.source}${star && matchWorn ? ' · Icon-player match-worn premium' : ''}`, createdAt: new Date().toISOString() };
     store.write('collection', [shirt, ...store.read('collection')]);
     json(res, shirt, 201);
   },
