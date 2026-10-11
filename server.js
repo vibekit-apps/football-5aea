@@ -43,11 +43,11 @@ const routes = {
     const { shirtId, signature, matchUsedType, importance, match } = await readBody(req);
     const catalogShirt = GAME_CATALOG.flatMap((club) => club.shirts.map((shirt) => ({ ...shirt, league: club.league, team: club.team }))).find((shirt) => shirt.id === shirtId);
     if (!catalogShirt || !signature) return json(res, { error: 'Select a shirt and its version.' }, 400);
-    const { league, team, player, kit } = catalogShirt;
+    const { league, team, player, kit, season } = catalogShirt;
     const query = `${player} ${team} ${kit} football shirt ${signature === 'Original' ? '' : signature}`.trim();
     const listing = await marketEstimate(query);
     const matchWorn = signature === 'Match used';
-    const value = estimateShirtValue({ player, signature, matchUsedType, importance, base: listing.price || 55 });
+    const value = estimateShirtValue({ player, signature, matchUsedType, importance, base: listing.price || 55, season, match });
     const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: matchWorn ? matchUsedType : '', importance: matchWorn ? importance : '', match: matchWorn ? String(match || '').trim().slice(0, 120) : '', value, marketSource: `${listing.source}${matchWorn ? ' · player, competition and occasion premium applied' : ''}`, createdAt: new Date().toISOString() };
     store.write('collection', [shirt, ...store.read('collection')]);
     json(res, shirt, 201);
@@ -122,12 +122,20 @@ function mergeCatalog(clubs) {
 }
 
 function playerTier(player) {
-  if (/^(Lionel Messi|Cristiano Ronaldo|Neymar|Kylian Mbappé|Kylian Mbappe|Lamine Yamal)$/i.test(player)) return 10;
-  if (/^(Erling Haaland|Vinícius Júnior|Vinicius Junior|Jude Bellingham|Mohamed Salah|Harry Kane|Robert Lewandowski|Kevin De Bruyne|Karim Benzema)$/i.test(player)) return 7;
+  if (/^(Lionel Messi|Cristiano Ronaldo|Neymar|Kylian Mbappé|Kylian Mbappe|Lamine Yamal|Jude Bellingham)$/i.test(player)) return 10;
+  if (/^(Erling Haaland|Vinícius Júnior|Vinicius Junior|Mohamed Salah|Harry Kane|Robert Lewandowski|Kevin De Bruyne|Karim Benzema)$/i.test(player)) return 7;
   return 1;
 }
-function estimateShirtValue({ player, signature, matchUsedType, importance, base }) {
-  if (signature !== 'Match used') return Math.max(signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20, Math.round(base * (signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1)));
+function estimateShirtValue({ player, signature, matchUsedType, importance, base, season, match }) {
+  // Special rule: Messi's iconic 2017 Barca vs Madrid home shirt worth 400k only when exact phrase entered
+  const momentPhrase = (match || '').toLowerCase();
+  const isExactMoment = momentPhrase.includes('barca vs madrid classic') && momentPhrase.includes('messi shirt');
+  if (player === 'Lionel Messi' && signature === 'Match used' && season === '2017' && isExactMoment) {
+    return Math.round(base * 400000);
+  }
+  if (signature !== 'Match used') {
+    return Math.max(signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20, Math.round(base * (signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1)));
+  }
   const tier = playerTier(player);
   const competition = { 'Club friendly': 1, 'League match': 4, 'Cup match': 7, 'Champions League match': 13, 'International match': 11 }[matchUsedType] || 4;
   const occasion = { 'Standard match': 1, 'Knockout match': 2.4, 'Final': 5.5, 'Rivalry / derby': 7 }[importance] || 1;
@@ -136,10 +144,11 @@ function estimateShirtValue({ player, signature, matchUsedType, importance, base
 }
 function makeIconicArchive() {
   const careers = [
-    ['Lionel Messi','Barcelona','La Liga',2004,2021],['Lionel Messi','Paris Saint-Germain','Ligue 1',2021,2023],['Lionel Messi','Inter Miami','Major League Soccer',2023,2025],
+    ['Lionel Messi','Barcelona','La Liga',2004,2024],['Lionel Messi','Paris Saint-Germain','Ligue 1',2021,2023],['Lionel Messi','Inter Miami','Major League Soccer',2023,2025],
     ['Cristiano Ronaldo','Sporting CP','Primeira Liga',2002,2003],['Cristiano Ronaldo','Manchester United','Premier League',2003,2009],['Cristiano Ronaldo','Real Madrid','La Liga',2009,2018],['Cristiano Ronaldo','Juventus','Serie A',2018,2021],['Cristiano Ronaldo','Al Nassr','Saudi Pro League',2023,2025],
     ['Neymar','Santos','Brasileirão Série A',2009,2013],['Neymar','Barcelona','La Liga',2013,2017],['Neymar','Paris Saint-Germain','Ligue 1',2017,2023],['Neymar','Al Hilal','Saudi Pro League',2023,2025],
     ['Kylian Mbappé','Monaco','Ligue 1',2015,2017],['Kylian Mbappé','Paris Saint-Germain','Ligue 1',2017,2024],['Kylian Mbappé','Real Madrid','La Liga',2024,2025],
+    ['Erling Haaland','Borussia Dortmund','Bundesliga',2020,2024],['Erling Haaland','Manchester City','Premier League',2022,2025],
     ['Lamine Yamal','Barcelona','La Liga',2023,2025],['Zinedine Zidane','Juventus','Serie A',1996,2001],['Zinedine Zidane','Real Madrid','La Liga',2001,2006],['Thierry Henry','Arsenal','Premier League',1999,2007],['Ronaldinho','Barcelona','La Liga',2003,2008],
     ['Xavi','Barcelona','La Liga',1998,2015],['Andrés Iniesta','Barcelona','La Liga',2002,2018],['Carles Puyol','Barcelona','La Liga',1999,2014],['Samuel Eto’o','Barcelona','La Liga',2004,2009],['Luis Suárez','Barcelona','La Liga',2014,2020],['Rivaldo','Barcelona','La Liga',1997,2002],
     ['Raúl','Real Madrid','La Liga',1994,2010],['Iker Casillas','Real Madrid','La Liga',1999,2015],['Sergio Ramos','Real Madrid','La Liga',2005,2021],['Luka Modrić','Real Madrid','La Liga',2012,2024],['David Beckham','Real Madrid','La Liga',2003,2007],
