@@ -47,11 +47,8 @@ const routes = {
     const query = `${player} ${team} ${kit} football shirt ${signature === 'Original' ? '' : signature}`.trim();
     const listing = await marketEstimate(query);
     const matchWorn = signature === 'Match used';
-    const multiplier = matchWorn ? (importance === 'Very important' ? 18 : importance === 'Important' ? 8 : 4.5) : signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1;
-    const star = /neymar|messi|ronaldo|mbappé|mbappe|lamine yamal/i.test(player);
-    const floor = matchWorn ? (importance === 'Very important' ? (star ? 15000 : 6000) : importance === 'Important' ? (star ? 7000 : 2500) : (star ? 2500 : 650)) : signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20;
-    const value = Math.max(floor, Math.round((listing.price || 55) * multiplier * (star && matchWorn ? 2.5 : 1)));
-    const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: matchWorn ? matchUsedType : '', importance: matchWorn ? importance : '', match: matchWorn ? String(match || '').trim().slice(0, 120) : '', value, marketSource: `${listing.source}${star && matchWorn ? ' · Icon-player match-worn premium' : ''}`, createdAt: new Date().toISOString() };
+    const value = estimateShirtValue({ player, signature, matchUsedType, importance, base: listing.price || 55 });
+    const shirt = { id: crypto.randomUUID(), shirtId, league, team, player, kit, season: catalogShirt.season, signature, matchUsedType: matchWorn ? matchUsedType : '', importance: matchWorn ? importance : '', match: matchWorn ? String(match || '').trim().slice(0, 120) : '', value, marketSource: `${listing.source}${matchWorn ? ' · player, competition and occasion premium applied' : ''}`, createdAt: new Date().toISOString() };
     store.write('collection', [shirt, ...store.read('collection')]);
     json(res, shirt, 201);
   },
@@ -117,7 +114,36 @@ const routes = {
 
 // Officially listed squad data for the 2026/27 and 2025/26 seasons. A player
 // appears only with the club they represented in the shirt's listed season.
-const GAME_CATALOG = CURRENT_SQUADS_2026_27;
+const GAME_CATALOG = CURRENT_SQUADS_2026_27.concat(makeIconicArchive());
+
+function playerTier(player) {
+  if (/^(Lionel Messi|Cristiano Ronaldo|Neymar|Kylian Mbappé|Kylian Mbappe|Lamine Yamal)$/i.test(player)) return 10;
+  if (/^(Erling Haaland|Vinícius Júnior|Vinicius Junior|Jude Bellingham|Mohamed Salah|Harry Kane|Robert Lewandowski|Kevin De Bruyne|Karim Benzema)$/i.test(player)) return 7;
+  return 1;
+}
+function estimateShirtValue({ player, signature, matchUsedType, importance, base }) {
+  if (signature !== 'Match used') return Math.max(signature === 'Hand signed' ? 175 : signature === 'Print signed' ? 85 : 20, Math.round(base * (signature === 'Hand signed' ? 2.25 : signature === 'Print signed' ? 1.35 : 1)));
+  const tier = playerTier(player);
+  const competition = { 'Club friendly': 1, 'League match': 4, 'Cup match': 7, 'Champions League match': 13, 'International match': 11 }[matchUsedType] || 4;
+  const occasion = { 'Standard match': 1, 'Knockout match': 2.4, 'Final': 5.5, 'Rivalry / derby': 7 }[importance] || 1;
+  const floor = Math.round(450 * competition * occasion * (1 + tier * 0.45));
+  return Math.max(floor, Math.round(base * competition * occasion * (1 + tier * 0.45)));
+}
+function makeIconicArchive() {
+  const careers = [
+    ['Lionel Messi','Barcelona','La Liga',2004,2021],['Lionel Messi','Paris Saint-Germain','Ligue 1',2021,2023],['Lionel Messi','Inter Miami','Major League Soccer',2023,2025],
+    ['Cristiano Ronaldo','Sporting CP','Primeira Liga',2002,2003],['Cristiano Ronaldo','Manchester United','Premier League',2003,2009],['Cristiano Ronaldo','Real Madrid','La Liga',2009,2018],['Cristiano Ronaldo','Juventus','Serie A',2018,2021],['Cristiano Ronaldo','Al Nassr','Saudi Pro League',2023,2025],
+    ['Neymar','Santos','Brasileirão Série A',2009,2013],['Neymar','Barcelona','La Liga',2013,2017],['Neymar','Paris Saint-Germain','Ligue 1',2017,2023],['Neymar','Al Hilal','Saudi Pro League',2023,2025],
+    ['Kylian Mbappé','Monaco','Ligue 1',2015,2017],['Kylian Mbappé','Paris Saint-Germain','Ligue 1',2017,2024],['Kylian Mbappé','Real Madrid','La Liga',2024,2025],
+    ['Lamine Yamal','Barcelona','La Liga',2023,2025],['Zinedine Zidane','Juventus','Serie A',1996,2001],['Zinedine Zidane','Real Madrid','La Liga',2001,2006],['Thierry Henry','Arsenal','Premier League',1999,2007],['Ronaldinho','Barcelona','La Liga',2003,2008]
+  ];
+  const clubs = new Map();
+  for (const [player, team, league, from, to] of careers) for (let year = from; year < to; year++) {
+    const key = `${league}|${team}`; if (!clubs.has(key)) clubs.set(key, { league, team, shirts: [] });
+    for (const kit of ['Home shirt','Away shirt','Third shirt']) clubs.get(key).shirts.push({ id: `icon-${player}-${team}-${year}-${kit}`.replace(/[^a-z0-9]+/gi, '-').toLowerCase(), player, kit, season: `${year}/${String(year + 1).slice(-2)}` });
+  }
+  return [...clubs.values()];
+}
 
 // Each added league has its complete club list. Every club gets a browsing roster
 // and four collectible shirt eras per player, keeping the catalog rich without a

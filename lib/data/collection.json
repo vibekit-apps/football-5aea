@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "id": "e2c4aff3-b12f-4931-acf4-e0457bdd84c0",
+    "shirtId": "major-league-soccer-20232-9-0",
+    "league": "Major League Soccer",
+    "team": "Inter Miami CF",
+    "player": "Israel Boatwright",
+    "kit": "Home shirt",
+    "season": "2026/27",
+    "signature": "Match used",
+    "matchUsedType": "League match worn",
+    "importance": "Not important",
+    "match": "",
+    "value": 650,
+    "marketSource": "Starter estimate — live listings unavailable",
+    "createdAt": "2026-10-11T07:36:31.864Z"
+  },
+  {
+    "id": "700bd61b-cd89-411f-9db7-388104560453",
+    "shirtId": "la-liga-83-24-0",
+    "league": "La Liga",
+    "team": "Barcelona",
+    "player": "Anthony Gordon",
+    "kit": "Home shirt",
+    "season": "2026/27",
+    "signature": "Match used",
+    "matchUsedType": "League match worn",
+    "importance": "Not important",
+    "match": "Barcelona vs getafe   26/27",
+    "value": 650,
+    "marketSource": "Starter estimate — live listings unavailable",
+    "createdAt": "2026-10-11T07:33:11.874Z"
+  }
+]
