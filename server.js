@@ -157,17 +157,342 @@ function makeIconicArchive() {
   return [...clubs.values()];
 }
 function makeNationalTeams() {
-  const countries = [
-    ['Argentina',['Lionel Messi','Ángel Di María','Leandro Paredes']],['Brazil',['Neymar','Vinícius Júnior','Raphinha']],['France',['Kylian Mbappé','Antoine Griezmann','Aurélien Tchouaméni']],['Spain',['Lamine Yamal','Pedri','Gavi']],['Germany',['Jamal Musiala','Florian Wirtz','Kai Havertz']],['Italy',['Lautaro Martínez','Nicola Zalewski','Gianluigi Donnarumma']],['England',['Harry Kane','Phil Foden','Declan Rice']],['Netherlands',['Cody Gakpo','Xavi Simons','Virgil van Dijk']],['Belgium',['Kevin De Bruyne','Romelu Lukaku','Youri Tielemans']],
-    ['Uruguay',['Darwin Núñez','Federico Valverde','Rodrigo Bentancur']],['Croatia',['Luka Modrić','Marcelo Brozović','Domagoj Vida']],['Colombia',['Luis Díaz','James Rodríguez','Rafael Santos']],['Mexico',['Hirving Lozano','Raúl Jiménez','Édson Álvarez']],['United States',['Christian Pulisic','Weston McKennie','Giovanni Reyna']],['Japan',['Takefusa Kubo','Daichi Kamada','Yusaku Mitake']],['South Korea',['Son Heung-min','Hwang Hee-chan','Kim Min-jae']],['Australia',['Mathew Leckie','Aaron Mooy','Daniel Arzani']],['Morocco',['Achraf Hakimi','Youssef En-Nesyri','Sofyan Amrabat']],['Nigeria',['Victor Osimhen','Samuel Chukwueze','Wilfred Ndidi']],
-    ['Senegal',['Sadio Mané','Ismaila Sarr','Kalidou Koulibaly']],['Cameroon',['André Onana','Karl Toko Ekambi','Vincent Aboubakar']],['Ghana',['Thomas Partey','Mohammed Kudus','Inaki Williams']],['Egypt',['Mohamed Salah','Mohamed El-Shenawy','Ahmed Hegazi']],['Algeria',['Riyad Mahrez','Ismaël Bennacer','Youcef Belaïli']],['Ivory Coast',['Franck Kessié','Nicolas Pépé','Max Gradel']],['South Africa',['Percy Tau','Teboho Mokoena','Gronk']],['Tunisia',['Wahbi Khazri','Youssef Msakni','Dylan Bronn']],['Iran',['Sardar Azmoun','Mehdi Taremi','Ali Gholizadeh']],['Saudi Arabia',['Salem Al-Dawsari','Fahad Al-Muwallad','Saleh Al-Shehri']],
-    ['Qatar',['Akram Afif','Almoez Ali','Mohamed Muntashim']],['United Arab Emirates',['Ali Mabkhout','Sebastián Tagliabúe','Ali Al-Hofi']],['Turkey',['Hakan Çalhanoğlu','Cengiz Ünder','Okay Yokuşlu']],['Greece',['Anastasios Bakasetas','Georgios Masouras','Dimitris Bowzikidis']],['Sweden',['Alexander Isak','Dejan Kulusevski','Robin Olsen']],['Norway',['Erling Haaland','Martin Ødegaard','Sander Berge']],['Denmark',['Christian Eriksen','Pierre-Emile Højbjerg','Kasper Dolberg']],['Poland',['Robert Lewandowski','Piotr Zielinski','Kacper Przybyło']],['Czech Republic',['Patrik Schick','Tomáš Souček','Kamil Jiříčko']],['Serbia',['Dušan Tadić','Filip Kostić','Aleksandar Mitrović']],
-    ['Switzerland',['Granit Xhaka','Xherdan Shaqiri','Breel Embolo']],['Austria',['Marco Sabitzer','Roman Jakobovic','Michael Arnautovic']],['Ukraine',['Oleksandr Zinchenko','Mykhailo Mudryk','Oleksandr Zub']],['Russia',['Aleksandr Golovin','Anton Miranchuk','Denis Popov']],['Chile',['Alexis Sánchez','Arturo Vidal','Charles Aránguiz']],['Peru',['Gianluca Lapadula','Pedro Aquino','Yordy Reyna']],['Ecuador',['Enner Valencia','Moisés Caicedo','Carlos Gurín']],['Paraguay',['Miguel Almirón','Gustavo Gómez','Andrés Gómez']],['Costa Rica',['Keylor Navas','Johan Villamar','Celso Borges']],['Jamaica',['Leon Bailey','Danejay Cotton','Rice Bosco']],['Canada',['Alphonso Davies','Jonathan David','Cyle Larin']],['New Zealand',['Chris Wood','Ryan Nelsen','Kosta Barbarouses']]
+  const nationalTeamData = [
+    {
+      country: 'Argentina',
+      recent: ['Lionel Messi', 'Ángel Di María', 'Leandro Paredes'],
+      historical2010: ['Lionel Messi', 'Carlos Tévez', 'Gonzalo Higuaín'],
+      historical2002: ['Juan Román Riquelme', 'Roberto Ayala', 'Javier Zanetti']
+    },
+    {
+      country: 'Brazil',
+      recent: ['Neymar', 'Vinícius Júnior', 'Raphinha'],
+      historical2010: ['Neymar', 'Lúcio', 'Juan'],
+      historical2002: ['Ronaldo', 'Ronaldinho', 'Kaká']
+    },
+    {
+      country: 'France',
+      recent: ['Kylian Mbappé', 'Antoine Griezmann', 'Aurélien Tchouaméni'],
+      historical2010: ['Thierry Henry', 'Nicolas Anelka', 'Franck Ribéry'],
+      historical2002: ['Zinedine Zidane', 'Thierry Henry', 'David Trezeguet']
+    },
+    {
+      country: 'Spain',
+      recent: ['Lamine Yamal', 'Pedri', 'Gavi'],
+      historical2010: ['Xavi Hernández', 'Andrés Iniesta', 'David Villa'],
+      historical2002: ['Raúl González', 'Iker Casillas', 'Fernando Torres']
+    },
+    {
+      country: 'Germany',
+      recent: ['Jamal Musiala', 'Florian Wirtz', 'Kai Havertz'],
+      historical2010: ['Thomas Müller', 'Bastian Schweinsteiger', 'Philipp Lahm'],
+      historical2002: ['Michael Ballack', 'Oliver Kahn', 'Miroslav Klose']
+    },
+    {
+      country: 'Italy',
+      recent: ['Lautaro Martínez', 'Nicola Zalewski', 'Gianluigi Donnarumma'],
+      historical2010: ['Francesco Totti', 'Daniele De Rossi', 'Andrea Pirlo'],
+      historical2002: ['Alessandro Nesta', 'Fabio Cannavaro', 'Francesco Totti']
+    },
+    {
+      country: 'England',
+      recent: ['Harry Kane', 'Phil Foden', 'Declan Rice'],
+      historical2010: ['Wayne Rooney', 'Frank Lampard', 'Steven Gerrard'],
+      historical2002: ['David Beckham', 'Michael Owen', 'Rio Ferdinand']
+    },
+    {
+      country: 'Netherlands',
+      recent: ['Cody Gakpo', 'Xavi Simons', 'Virgil van Dijk'],
+      historical2010: ['Arjen Robben', 'Robin van Persie', 'Wesley Sneijder'],
+      historical2002: ['Patrick Kluivert', 'Ruud van Nistelrooy', 'Edgar Davids']
+    },
+    {
+      country: 'Belgium',
+      recent: ['Kevin De Bruyne', 'Romelu Lukaku', 'Youri Tielemans'],
+      historical2010: ['Vincent Kompany', 'Marouane Fellaini', 'Eden Hazard'],
+      historical2002: ['Marc Wilmots', 'Daniel Van Buyten', 'Jan Koller']
+    },
+    {
+      country: 'Uruguay',
+      recent: ['Darwin Núñez', 'Federico Valverde', 'Rodrigo Bentancur'],
+      historical2010: ['Diego Forlán', 'Luis Suárez', 'Edinson Cavani'],
+      historical2002: ['Diego Forlán', 'Alvaro Recoba', 'Paolo Montero']
+    },
+    {
+      country: 'Croatia',
+      recent: ['Luka Modrić', 'Marcelo Brozović', 'Domagoj Vida'],
+      historical2010: ['Luka Modrić', 'Ivan Rakitić', 'Dario Šimić'],
+      historical2002: ['Robert Kovač', 'Darijo Srna', 'Ivan Klasnić']
+    },
+    {
+      country: 'Colombia',
+      recent: ['Luis Díaz', 'James Rodríguez', 'Rafael Santos'],
+      historical2010: ['Radamel Falcao', 'James Rodríguez', 'Mario Yepes'],
+      historical2002: ['Faustino Asprilla', 'Ivan Córdoba', 'Humberto Mendoza']
+    },
+    {
+      country: 'Mexico',
+      recent: ['Hirving Lozano', 'Raúl Jiménez', 'Édson Álvarez'],
+      historical2010: ['Javier Hernández', 'Cuauhtémoc Blanco', 'Pavel Pardo'],
+      historical2002: ['Jared Borgetti', 'Luis Hernández', 'Carlos Pavón']
+    },
+    {
+      country: 'United States',
+      recent: ['Christian Pulisic', 'Weston McKennie', 'Giovanni Reyna'],
+      historical2010: ['Landon Donovan', 'Clint Dempsey', 'Tim Howard'],
+      historical2002: ['Claudio Reyna', 'Brian McBride', 'Eddie Johnson']
+    },
+    {
+      country: 'Japan',
+      recent: ['Takefusa Kubo', 'Daichi Kamada', 'Yusaku Mitake'],
+      historical2010: ['Keisuke Honda', 'Shunsuke Nakamura', 'Yoshito Ōkubo'],
+      historical2002: ['Hidetoshi Nakata', 'Atsushi Yanagisawa', 'Takayuki Suzuki']
+    },
+    {
+      country: 'South Korea',
+      recent: ['Son Heung-min', 'Hwang Hee-chan', 'Lee Kang-in'],
+      historical2010: ['Park Ji-sung', 'Lee Chun-soo', 'Ahn Jung-hwan'],
+      historical2002: ['Park Ji-sung', 'Lee Young-pyo', 'Ahn Jung-hwan']
+    },
+    {
+      country: 'Australia',
+      recent: ['Mathew Leckie', 'Aaron Mooy', 'Daniel Arzani'],
+      historical2010: ['Tim Cahill', 'Brett Holman', 'Mark Bresciano'],
+      historical2002: ['Harry Kewell', 'Mark Viduka', 'Craig Moore']
+    },
+    {
+      country: 'Morocco',
+      recent: ['Achraf Hakimi', 'Youssef En-Nesyri', 'Sofyan Amrabat'],
+      historical2010: ['Bouchaib El Moubarki', 'Youssef Mokhtari', 'Abdelmajid Dolmy'],
+      historical2002: ['Mustapha Hadji', 'Youssef Mokhtari', 'Nourredine Naybet']
+    },
+    {
+      country: 'Nigeria',
+      recent: ['Victor Osimhen', 'Samuel Chukwueze', 'Wilfred Ndidi'],
+      historical2010: ['Nwankwo Kanu', 'Joseph Yobo', 'Obafemi Martins'],
+      historical2002: ['Nwankwo Kanu', 'Finidi George', 'Jay-Jay Okocha']
+    },
+    {
+      country: 'Senegal',
+      recent: ['Sadio Mané', 'Ismaila Sarr', 'Kalidou Koulibaly'],
+      historical2010: ['Henri Camara', 'Tony Sylva', 'Fadiga'],
+      historical2002: ['Henri Camara', 'Tony Sylva', 'Fadiga']
+    },
+    {
+      country: 'Cameroon',
+      recent: ['André Onana', 'Karl Toko Ekambi', 'Vincent Aboubakar'],
+      historical2010: ['Samuel Eto\'o', 'Pierre Womé', 'Rigobert Song'],
+      historical2002: ['Samuel Eto\'o', 'Pierre Womé', 'Rigobert Song']
+    },
+    {
+      country: 'Ghana',
+      recent: ['Thomas Partey', 'Mohammed Kudus', 'Inaki Williams'],
+      historical2010: ['Michael Essien', 'Asamoah Gyan', 'John Paintsil'],
+      historical2002: ['Abedi Pelé', 'Stephen Appiah', 'John Paintsil']
+    },
+    {
+      country: 'Egypt',
+      recent: ['Mohamed Salah', 'Mohamed El-Shenawy', 'Ahmed Hegazi'],
+      historical2010: ['Mohamed Aboutrika', 'Hossam Hassan', 'Emad Moteab'],
+      historical2002: ['Hossam Hassan', 'Abdel Zaher El Sakka', 'Hassan Mostafa']
+    },
+    {
+      country: 'Algeria',
+      recent: ['Riyad Mahrez', 'Ismaël Bennacer', 'Youcef Belaïli'],
+      historical2010: ['Karim Ziani', 'Rafik Saïfi', 'Yazid Mansouri'],
+      historical2002: ['Abdelmalek Cherrad', 'Ali Benarbia', 'Liamine Cherifi']
+    },
+    {
+      country: 'Ivory Coast',
+      recent: ['Franck Kessié', 'Nicolas Pépé', 'Max Gradel'],
+      historical2010: ['Didier Drogba', 'Yaya Touré', 'Kolo Touré'],
+      historical2002: ['Didier Drogba', 'Yaya Touré', 'Kolo Touré']
+    },
+    {
+      country: 'South Africa',
+      recent: ['Percy Tau', 'Teboho Mokoena', 'Gordon'],
+      historical2010: ['Steven Pienaar', 'Aaron Mokoena', 'MacBeth Sibaya'],
+      historical2002: ['Benni McCarthy', 'Quinton Fortune', 'Pierre Issa']
+    },
+    {
+      country: 'Tunisia',
+      recent: ['Wahbi Khazri', 'Youssef Msakni', 'Dylan Bronn'],
+      historical2010: ['Radhi Jaïdi', 'Youssef Msakni', 'Khaled Badra'],
+      historical2002: ['Radhi Jaïdi', 'Kaïs Ghodhbane', 'Ferid Chougab']
+    },
+    {
+      country: 'Iran',
+      recent: ['Sardar Azmoun', 'Mehdi Taremi', 'Ali Gholizadeh'],
+      historical2010: ['Ali Daei', 'Javad Nekounam', 'Mehdi Mahdavikia'],
+      historical2002: ['Ali Daei', 'Karim Bagheri', 'Mehdi Mahdavikia']
+    },
+    {
+      country: 'Saudi Arabia',
+      recent: ['Salem Al-Dawsari', 'Fahad Al-Muwallad', 'Yahya Al-Shehri'],
+      historical2010: ['Yasser Al-Qahtani', 'Mohammed Noor', 'Taisir Al-Jassim'],
+      historical2002: ['Sami Al-Jaber', 'Naser Al-Shamrani', 'Omar Al-Ghamdi']
+    },
+    {
+      country: 'Qatar',
+      recent: ['Akram Afif', 'Almoez Ali', 'Mohamed Muntashim'],
+      historical2010: ['José Carlos Fernández', 'Magid Mohamed', 'Abdulaziz Karim'],
+      historical2002: ['Mubarak Mustafa', 'Younis Ahmed', 'Ali Ahmed']
+    },
+    {
+      country: 'United Arab Emirates',
+      recent: ['Ali Mabkhout', 'Sebastián Tagliabúe', 'Ali Al-Hofi'],
+      historical2010: ['Adnan Al Talyani', 'Khalid Ismaeel', 'Mahmoud Khalil'],
+      historical2002: ['Adnan Al Talyani', 'Khalid Ismaeel', 'Mahmoud Khalil']
+    },
+    {
+      country: 'Turkey',
+      recent: ['Hakan Çalhanoğlu', 'Cengiz Ünder', 'Okay Yokuşlu'],
+      historical2010: ['Hakan Şükür', 'Emre Belözoğlu', 'Tunçay'],
+      historical2002: ['Hakan Şükür', 'Emre Belözoğlu', 'Tunçay']
+    },
+    {
+      country: 'Greece',
+      recent: ['Anastasios Bakasetas', 'Giorgos Masouras', 'Dimitris Bowzikidis'],
+      historical2010: ['Angelos Basinas', 'Theodoros Zagorakis', 'Vangelis Moras'],
+      historical2002: ['Angelos Basinas', 'Theodoros Zagorakis', 'Vangelis Moras']
+    },
+    {
+      country: 'Sweden',
+      recent: ['Alexander Isak', 'Dejan Kulusevski', 'Robin Olsen'],
+      historical2010: ['Zlatan Ibrahimović', 'Christian Wilhelmsson', 'Mattias Jonson'],
+      historical2002: ['Zlatan Ibrahimović', 'Fredrik Ljungberg', 'Anders Svensson']
+    },
+    {
+      country: 'Norway',
+      recent: ['Erling Haaland', 'Martin Ødegaard', 'Sander Berge'],
+      historical2010: ['John Arne Riise', 'Steffen Iversen', 'Joshua King'],
+      historical2002: ['John Arne Riise', 'Egil Østenstad', 'Frode Johnsen']
+    },
+    {
+      country: 'Denmark',
+      recent: ['Christian Eriksen', 'Pierre-Emile Højbjerg', 'Kasper Dolberg'],
+      historical2010: ['Michael Laudrup', 'Jon Dahl Tomasson', 'Martin Jørgensen'],
+      historical2002: ['Michael Laudrup', 'Jon Dahl Tomasson', 'Martin Jørgensen']
+    },
+    {
+      country: 'Poland',
+      recent: ['Robert Lewandowski', 'Piotr Zielinski', 'Nicola Zalewski'],
+      historical2010: ['Maciej Żurawski', 'Paweł Brożek', 'Radosław Matusiak'],
+      historical2002: ['Maciej Żurawski', 'Paweł Brożek', 'Radosław Matusiak']
+    },
+    {
+      country: 'Czech Republic',
+      recent: ['Patrik Schick', 'Tomáš Souček', 'Kamil Jiříčko'],
+      historical2010: ['Pavel Nedvěd', 'Jan Koller', 'Milan Baroš'],
+      historical2002: ['Pavel Nedvěd', 'Jan Koller', 'Milan Baroš']
+    },
+    {
+      country: 'Serbia',
+      recent: ['Dušan Tadić', 'Filip Kostić', 'Aleksandar Mitrović'],
+      historical2010: ['Dejan Stanković', 'Nemanja Vidić', 'Ognjen Koroman'],
+      historical2002: ['Dejan Stanković', 'Ilija Petković', 'Vladimir Jugović']
+    },
+    {
+      country: 'Switzerland',
+      recent: ['Granit Xhaka', 'Xherdan Shaqiri', 'Breel Embolo'],
+      historical2010: ['Alexander Frei', 'Hakan Yakin', 'Tranquillo Barnetta'],
+      historical2002: ['Patrick Müller', 'Ricardo Cabanas', 'Marco Streller']
+    },
+    {
+      country: 'Austria',
+      recent: ['Marco Sabitzer', 'Roman Jakobovic', 'Michael Arnautovic'],
+      historical2010: ['Andreas Ivanschitz', 'Richard Windbichler', 'Friedrich Schacherl'],
+      historical2002: ['Andreas Herzog', 'Mario Haas', 'Marion Stalzer']
+    },
+    {
+      country: 'Ukraine',
+      recent: ['Oleksandr Zinchenko', 'Mykhailo Mudryk', 'Oleksandr Zub'],
+      historical2010: ['Andriy Shevchenko', 'Vitaliy Mandzyuk', 'Oleksandr Hodzij'],
+      historical2002: ['Andriy Shevchenko', 'Ihor Leonov', 'Ruslan Rotan']
+    },
+    {
+      country: 'Russia',
+      recent: ['Aleksandr Golovin', 'Anton Miranchuk', 'Denis Popov'],
+      historical2010: ['Andrey Arshavin', 'Yuri Zhirkov', 'Roman Pavlyuchenko'],
+      historical2002: ['Yegor Titov', 'Vladimir Beschastnykh', 'Alexei Smertin']
+    },
+    {
+      country: 'Chile',
+      recent: ['Alexis Sánchez', 'Arturo Vidal', 'Charles Aránguiz'],
+      historical2010: ['Alexis Sánchez', 'Mark González', 'Jorge Valdivia'],
+      historical2002: ['Marcelo Salas', 'Iván Zamorano', 'Clarence Acuña']
+    },
+    {
+      country: 'Peru',
+      recent: ['Gianluca Lapadula', 'Pedro Aquino', 'Yordy Reyna'],
+      historical2010: ['Claudio Pizarro', 'Roberto Palacios', 'José del Solar'],
+      historical2002: ['Claudio Pizarro', 'Roberto Palacios', 'José del Solar']
+    },
+    {
+      country: 'Ecuador',
+      recent: ['Enner Valencia', 'Moisés Caicedo', 'Ángel Mena'],
+      historical2010: ['Agustín Delgado', 'Iván Kaviedes', 'Luis Capurro'],
+      historical2002: ['Agustín Delgado', 'Iván Kaviedes', 'Luis Capurro']
+    },
+    {
+      country: 'Paraguay',
+      recent: ['Miguel Almirón', 'Gustavo Gómez', 'Andrés Gómez'],
+      historical2010: ['José Saturnino Cardozo', 'Carlos Humberto Paredes', 'Nelson Cuevas'],
+      historical2002: ['José Saturnino Cardozo', 'Carlos Humberto Paredes', 'Nelson Cuevas']
+    },
+    {
+      country: 'Costa Rica',
+      recent: ['Keylor Navas', 'Johan Villamar', 'Celso Borges'],
+      historical2010: ['Paulo Wanchope', 'Wuilberth Soto', 'Floyd Gutiérrez'],
+      historical2002: ['Paulo Wanchope', 'Wuilberth Soto', 'Floyd Gutiérrez']
+    },
+    {
+      country: 'Jamaica',
+      recent: ['Leon Bailey', 'Danejay Cotton', 'Rice Bosco'],
+      historical2010: ['Richard Hughes', 'Onandi Lowe', 'Dean Fowler'],
+      historical2002: ['Theodore Whitmore', 'Ricardo Gardner', 'Dale Shannon']
+    },
+    {
+      country: 'Canada',
+      recent: ['Alphonso Davies', 'Jonathan David', 'Cyle Larin'],
+      historical2010: ['Dwayne De Rosario', 'Ali Gerba', 'Mike Klukowski'],
+      historical2002: ['Dwayne De Rosario', 'Ali Gerba', 'Mike Klukowski']
+    },
+    {
+      country: 'New Zealand',
+      recent: ['Chris Wood', 'Ryan Nelsen', 'Kosta Barbarouses'],
+      historical2010: ['Ryan Nelsen', 'Simon Elliott', 'Darren Bazeley'],
+      historical2002: ['Ryan Nelsen', 'Simon Elliott', 'Darren Bazeley']
+    }
   ];
-  return countries.map(([team, players], i) => ({ league: 'National Teams', team, shirts: players.flatMap((player, p) => [
-    { id: `national-${i}-${p}-recent-home`, player, kit: 'Home shirt', season: '2026/27' }, { id: `national-${i}-${p}-recent-away`, player, kit: 'Away shirt', season: '2025/26' },
-    { id: `icon-national-${i}-${p}-2010`, player, kit: 'Home shirt', season: '2010/11' }, { id: `icon-national-${i}-${p}-2002`, player, kit: 'Away shirt', season: '2002/03' }
-  ]) }));
+
+  return nationalTeamData.map((data, i) => ({
+    league: 'National Teams',
+    team: data.country,
+    shirts: [
+      // 2026/27 kits (recent players)
+      { id: `national-${i}-${data.recent[0]}-recent-home`, player: data.recent[0], kit: 'Home shirt', season: '2026/27' },
+      { id: `national-${i}-${data.recent[0]}-recent-away`, player: data.recent[0], kit: 'Away shirt', season: '2025/26' },
+      { id: `national-${i}-${data.recent[1]}-recent-home`, player: data.recent[1], kit: 'Home shirt', season: '2026/27' },
+      { id: `national-${i}-${data.recent[1]}-recent-away`, player: data.recent[1], kit: 'Away shirt', season: '2025/26' },
+      { id: `national-${i}-${data.recent[2]}-recent-home`, player: data.recent[2], kit: 'Home shirt', season: '2026/27' },
+      { id: `national-${i}-${data.recent[2]}-recent-away`, player: data.recent[2], kit: 'Away shirt', season: '2025/26' },
+      // 2010/11 kits (historical 2010 players)
+      { id: `icon-national-${i}-${data.historical2010[0]}-2010-home`, player: data.historical2010[0], kit: 'Home shirt', season: '2010/11' },
+      { id: `icon-national-${i}-${data.historical2010[0]}-2010-away`, player: data.historical2010[0], kit: 'Away shirt', season: '2009/10' },
+      { id: `icon-national-${i}-${data.historical2010[1]}-2010-home`, player: data.historical2010[1], kit: 'Home shirt', season: '2010/11' },
+      { id: `icon-national-${i}-${data.historical2010[1]}-2010-away`, player: data.historical2010[1], kit: 'Away shirt', season: '2009/10' },
+      { id: `icon-national-${i}-${data.historical2010[2]}-2010-home`, player: data.historical2010[2], kit: 'Home shirt', season: '2010/11' },
+      { id: `icon-national-${i}-${data.historical2010[2]}-2010-away`, player: data.historical2010[2], kit: 'Away shirt', season: '2009/10' },
+      // 2002/03 kits (historical 2002 players)
+      { id: `icon-national-${i}-${data.historical2002[0]}-2002-home`, player: data.historical2002[0], kit: 'Home shirt', season: '2002/03' },
+      { id: `icon-national-${i}-${data.historical2002[0]}-2002-away`, player: data.historical2002[0], kit: 'Away shirt', season: '2001/02' },
+      { id: `icon-national-${i}-${data.historical2002[1]}-2002-home`, player: data.historical2002[1], kit: 'Home shirt', season: '2002/03' },
+      { id: `icon-national-${i}-${data.historical2002[1]}-2002-away`, player: data.historical2002[1], kit: 'Away shirt', season: '2001/02' },
+      { id: `icon-national-${i}-${data.historical2002[2]}-2002-home`, player: data.historical2002[2], kit: 'Home shirt', season: '2002/03' },
+      { id: `icon-national-${i}-${data.historical2002[2]}-2002-away`, player: data.historical2002[2], kit: 'Away shirt', season: '2001/02' }
+    ]
+  }));
 }
 
 // Each added league has its complete club list. Every club gets a browsing roster
