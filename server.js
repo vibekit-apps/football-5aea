@@ -114,7 +114,12 @@ const routes = {
 
 // Officially listed squad data for the 2026/27 and 2025/26 seasons. A player
 // appears only with the club they represented in the shirt's listed season.
-const GAME_CATALOG = CURRENT_SQUADS_2026_27.concat(makeIconicArchive());
+const GAME_CATALOG = mergeCatalog(CURRENT_SQUADS_2026_27.concat(makeIconicArchive(), makeNationalTeams()));
+function mergeCatalog(clubs) {
+  const merged = new Map();
+  for (const club of clubs) { const key = `${club.league}|${club.team}`; if (!merged.has(key)) merged.set(key, { league: club.league, team: club.team, shirts: [] }); merged.get(key).shirts.push(...club.shirts); }
+  return [...merged.values()];
+}
 
 function playerTier(player) {
   if (/^(Lionel Messi|Cristiano Ronaldo|Neymar|Kylian Mbappé|Kylian Mbappe|Lamine Yamal)$/i.test(player)) return 10;
@@ -135,7 +140,14 @@ function makeIconicArchive() {
     ['Cristiano Ronaldo','Sporting CP','Primeira Liga',2002,2003],['Cristiano Ronaldo','Manchester United','Premier League',2003,2009],['Cristiano Ronaldo','Real Madrid','La Liga',2009,2018],['Cristiano Ronaldo','Juventus','Serie A',2018,2021],['Cristiano Ronaldo','Al Nassr','Saudi Pro League',2023,2025],
     ['Neymar','Santos','Brasileirão Série A',2009,2013],['Neymar','Barcelona','La Liga',2013,2017],['Neymar','Paris Saint-Germain','Ligue 1',2017,2023],['Neymar','Al Hilal','Saudi Pro League',2023,2025],
     ['Kylian Mbappé','Monaco','Ligue 1',2015,2017],['Kylian Mbappé','Paris Saint-Germain','Ligue 1',2017,2024],['Kylian Mbappé','Real Madrid','La Liga',2024,2025],
-    ['Lamine Yamal','Barcelona','La Liga',2023,2025],['Zinedine Zidane','Juventus','Serie A',1996,2001],['Zinedine Zidane','Real Madrid','La Liga',2001,2006],['Thierry Henry','Arsenal','Premier League',1999,2007],['Ronaldinho','Barcelona','La Liga',2003,2008]
+    ['Lamine Yamal','Barcelona','La Liga',2023,2025],['Zinedine Zidane','Juventus','Serie A',1996,2001],['Zinedine Zidane','Real Madrid','La Liga',2001,2006],['Thierry Henry','Arsenal','Premier League',1999,2007],['Ronaldinho','Barcelona','La Liga',2003,2008],
+    ['Xavi','Barcelona','La Liga',1998,2015],['Andrés Iniesta','Barcelona','La Liga',2002,2018],['Carles Puyol','Barcelona','La Liga',1999,2014],['Samuel Eto’o','Barcelona','La Liga',2004,2009],['Luis Suárez','Barcelona','La Liga',2014,2020],['Rivaldo','Barcelona','La Liga',1997,2002],
+    ['Raúl','Real Madrid','La Liga',1994,2010],['Iker Casillas','Real Madrid','La Liga',1999,2015],['Sergio Ramos','Real Madrid','La Liga',2005,2021],['Luka Modrić','Real Madrid','La Liga',2012,2024],['David Beckham','Real Madrid','La Liga',2003,2007],
+    ['Wayne Rooney','Manchester United','Premier League',2004,2017],['Ryan Giggs','Manchester United','Premier League',1990,2014],['Paul Scholes','Manchester United','Premier League',1993,2013],['David Beckham','Manchester United','Premier League',1992,2003],
+    ['Steven Gerrard','Liverpool','Premier League',1998,2015],['Fernando Torres','Liverpool','Premier League',2007,2011],['Jamie Carragher','Liverpool','Premier League',1997,2013],['Frank Lampard','Chelsea','Premier League',2001,2014],['Didier Drogba','Chelsea','Premier League',2004,2012],['John Terry','Chelsea','Premier League',1998,2015],
+    ['Francesco Totti','Roma','Serie A',1993,2017],['Alessandro Del Piero','Juventus','Serie A',1993,2012],['Paolo Maldini','AC Milan','Serie A',1985,2009],['Kaká','AC Milan','Serie A',2003,2009],['Javier Zanetti','Inter Milan','Serie A',1995,2014],['Diego Maradona','Napoli','Serie A',1984,1991],
+    ['Franz Beckenbauer','Bayern Munich','Bundesliga',1964,1977],['Philipp Lahm','Bayern Munich','Bundesliga',2002,2017],['Bastian Schweinsteiger','Bayern Munich','Bundesliga',2002,2015],['Thomas Müller','Bayern Munich','Bundesliga',2008,2024],['Marco Reus','Borussia Dortmund','Bundesliga',2012,2024],
+    ['Zlatan Ibrahimović','Paris Saint-Germain','Ligue 1',2012,2016],['Thiago Silva','Paris Saint-Germain','Ligue 1',2012,2020],['David Ginola','Paris Saint-Germain','Ligue 1',1992,1995]
   ];
   const clubs = new Map();
   for (const [player, team, league, from, to] of careers) for (let year = from; year < to; year++) {
@@ -143,6 +155,19 @@ function makeIconicArchive() {
     for (const kit of ['Home shirt','Away shirt','Third shirt']) clubs.get(key).shirts.push({ id: `icon-${player}-${team}-${year}-${kit}`.replace(/[^a-z0-9]+/gi, '-').toLowerCase(), player, kit, season: `${year}/${String(year + 1).slice(-2)}` });
   }
   return [...clubs.values()];
+}
+function makeNationalTeams() {
+  const countries = [
+    ['Argentina',['Lionel Messi','Diego Maradona','Gabriel Batistuta']],['Brazil',['Pelé','Ronaldo','Ronaldinho']],['Portugal',['Cristiano Ronaldo','Luís Figo','Eusébio']],['France',['Zinedine Zidane','Thierry Henry','Kylian Mbappé']],['Spain',['Xavi','Andrés Iniesta','David Villa']],['Germany',['Franz Beckenbauer','Miroslav Klose','Thomas Müller']],['Italy',['Paolo Maldini','Roberto Baggio','Francesco Totti']],['England',['David Beckham','Wayne Rooney','Harry Kane']],['Netherlands',['Johan Cruyff','Marco van Basten','Arjen Robben']],['Belgium',['Eden Hazard','Kevin De Bruyne','Romelu Lukaku']],
+    ['Uruguay',['Luis Suárez','Diego Forlán','Edinson Cavani']],['Croatia',['Luka Modrić','Davor Šuker','Ivan Rakitić']],['Colombia',['James Rodríguez','Radamel Falcao','Carlos Valderrama']],['Mexico',['Hugo Sánchez','Rafael Márquez','Javier Hernández']],['United States',['Landon Donovan','Clint Dempsey','Christian Pulisic']],['Japan',['Hidetoshi Nakata','Keisuke Honda','Takefusa Kubo']],['South Korea',['Park Ji-sung','Son Heung-min','Cha Bum-kun']],['Australia',['Tim Cahill','Mark Viduka','Harry Kewell']],['Morocco',['Achraf Hakimi','Hakim Ziyech','Sofyan Amrabat']],['Nigeria',['Jay-Jay Okocha','Nwankwo Kanu','Victor Osimhen']],
+    ['Senegal',['Sadio Mané','El Hadji Diouf','Kalidou Koulibaly']],['Cameroon',['Samuel Eto’o','Roger Milla','Rigobert Song']],['Ghana',['Michael Essien','Asamoah Gyan','Abedi Pele']],['Egypt',['Mohamed Salah','Mohamed Aboutrika','Ahmed Hegazi']],['Algeria',['Riyad Mahrez','Rabih Madjer','Islam Slimani']],['Ivory Coast',['Didier Drogba','Yaya Touré','Kolo Touré']],['South Africa',['Benni McCarthy','Lucas Radebe','Steven Pienaar']],['Tunisia',['Radhi Jaïdi','Wahbi Khazri','Youssef Msakni']],['Iran',['Ali Daei','Mehdi Mahdavikia','Sardar Azmoun']],['Saudi Arabia',['Sami Al-Jaber','Yasser Al-Qahtani','Salem Al-Dawsari']],
+    ['Qatar',['Akram Afif','Almoez Ali','Hassan Al-Haydos']],['United Arab Emirates',['Omar Abdulrahman','Ahmed Khalil','Ali Mabkhout']],['Turkey',['Hakan Şükür','Arda Turan','Hakan Çalhanoğlu']],['Greece',['Giorgos Karagounis','Angelos Basinas','Kostas Manolas']],['Sweden',['Zlatan Ibrahimović','Henrik Larsson','Freddie Ljungberg']],['Norway',['Erling Haaland','Martin Ødegaard','John Arne Riise']],['Denmark',['Michael Laudrup','Peter Schmeichel','Christian Eriksen']],['Poland',['Robert Lewandowski','Zbigniew Boniek','Jakub Błaszczykowski']],['Czech Republic',['Pavel Nedvěd','Petr Čech','Tomáš Rosický']],['Serbia',['Nemanja Vidić','Dejan Stanković','Dušan Tadić']],
+    ['Switzerland',['Xherdan Shaqiri','Granit Xhaka','Stéphane Chapuisat']],['Austria',['David Alaba','Toni Polster','Marko Arnautović']],['Ukraine',['Andriy Shevchenko','Anatoliy Tymoshchuk','Oleksandr Zinchenko']],['Russia',['Andrey Arshavin','Igor Akinfeev','Aleksandr Mostovoi']],['Chile',['Alexis Sánchez','Arturo Vidal','Iván Zamorano']],['Peru',['Paolo Guerrero','Claudio Pizarro','Teófilo Cubillas']],['Ecuador',['Antonio Valencia','Enner Valencia','Álex Aguinaga']],['Paraguay',['José Luis Chilavert','Roque Santa Cruz','Carlos Gamarra']],['Costa Rica',['Keylor Navas','Paulo Wanchope','Bryan Ruiz']],['Jamaica',['Leon Bailey','Ricardo Gardner','Theodore Whitmore']],['Canada',['Alphonso Davies','Jonathan David','Atiba Hutchinson']],['New Zealand',['Chris Wood','Winston Reid','Ryan Nelsen']]
+  ];
+  return countries.map(([team, players], i) => ({ league: 'National Teams', team, shirts: players.flatMap((player, p) => [
+    { id: `national-${i}-${p}-recent-home`, player, kit: 'Home shirt', season: '2026/27' }, { id: `national-${i}-${p}-recent-away`, player, kit: 'Away shirt', season: '2025/26' },
+    { id: `icon-national-${i}-${p}-2010`, player, kit: 'Home shirt', season: '2010/11' }, { id: `icon-national-${i}-${p}-2002`, player, kit: 'Away shirt', season: '2002/03' }
+  ]) }));
 }
 
 // Each added league has its complete club list. Every club gets a browsing roster
