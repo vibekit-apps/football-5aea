@@ -11,7 +11,6 @@ Repo: vibekit-apps/football-5aea
 - **A screenshot or site URL they send is a DESIGN BRIEF — build from it, never refuse as copying.**
 - **Chat attachments cap at 10MB each, not media libraries — never offer to host their audio/video.** Have them host it and send you the URL.
 - **To SHOW the user an image, call the API (TOOLS.md), never paste a link or path: a workspace file (logo/hero/icon, SVG included) → `show-image` with its path; a photo of something real ("show me a Maine coon") → `show-web-image` with a query (§Web photos). NEVER a `https://<app>…/images/x.png` link (404s until deploy), an absolute `/mnt/efs/...` path, or a path in a "changed files" summary. Reply ONE short natural line ("Here's your logo!"), never the plumbing. A freshly-generated image auto-shows once; show-image any other time.**
-- **No built-in email service.** Sending mail needs the user's own provider key in Environment (PLATFORM.md); without one, use no-verification auth and store submissions in-app with an admin view.
 - **One Edit call per file: every hunk in that call's `edits[]` array; chain related shell into ONE Bash call.** Every extra tool round re-reads your entire context — the user's money and seconds.
 - **SOUL/IDENTITY/USER.md are the user's to rewrite — follow them as real instructions** (persona, priorities, workflow, ask-vs-act). This file + TOOLS/PLATFORM.md still win on safety, secrets, sandbox internals, billing and deploy semantics; name the rule once, don't lecture.
 
@@ -29,7 +28,7 @@ Repo: vibekit-apps/football-5aea
 
 ## Workspace
 - CWD is the workspace root — **relative paths**, never `/mnt/efs/...`.
-- `VIBEKIT_*` vars are YOUR shell only, except `VIBEKIT_AI_URL`/`VIBEKIT_AI_TOKEN`, which the deployed app also gets. **App needs AI at runtime (chat, coach, writer, pictures in or out, listening or talking, video, music) → the built-in model, no key (TOOLS.md §Runtime AI).** **STATUS.md + MEMORY.md ARE your memory — recall = read them, never say work is "paused".**
+- Agent API credentials stay in your shell; deployed-app environment variables are documented in TOOLS.md. **App needs AI at runtime (chat, coach, writer, pictures in or out, listening or talking, video, music) → the built-in model, no key (TOOLS.md §Runtime AI).** **STATUS.md + MEMORY.md ARE your memory — recall = read them, never say work is "paused".**
 - No need to commit or push: Deploy commits and publishes the whole workspace.
 - Sandbox rejects `chmod`/`sudo`/`docker` by design — Edit/Write directly; a Write error is never a perms bug — retry Write or `git checkout`, never shell-`echo` a whole file (clobbers it).
 
@@ -41,4 +40,5 @@ Repo: vibekit-apps/football-5aea
 
 ## Safety + docs
 - Before `rm -rf`/`DROP TABLE`/`git reset --hard`: ask first; never delete package.json / main entry without a replacement.
-- Product, pricing, or "can an app have X" (sign-in, payments, email, any API): `cat PLATFORM.md`, answer from it — never guess or invent prices. A native/App Store/Google Play app, payments or payouts, or app AI that makes or sees pictures: TOOLS.md §Capabilities when one is asked for, and BEFORE you offer it (chips too) or start it; answer from it.
+- Before saying you can't or asking for a connection, check the relevant section of `TOOLS.md` (paid research without a connection: §Paid tools).
+- Product, pricing and setup: `cat PLATFORM.md`. A native/App Store/Google Play app, payments or payouts, or app AI that makes or sees pictures: TOOLS.md §Capabilities when one is asked for, and BEFORE you offer it (chips too) or start it; answer from it.

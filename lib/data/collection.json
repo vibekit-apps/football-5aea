@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "ad826650-38bd-40d2-81cf-73f82fe59df3",
+    "shirtId": "icon-lionel-messi-barcelona-2017-home-shirt",
+    "league": "La Liga",
+    "team": "Barcelona",
+    "player": "Lionel Messi",
+    "kit": "Home shirt",
+    "season": "2017/18",
+    "signature": "Match used",
+    "matchUsedType": "League match",
+    "importance": "Really important",
+    "match": "Barca vs Madrid classic Messi shirt hold",
+    "value": 400000,
+    "marketSource": "Starter estimate — live listings unavailable · player, competition and occasion premium applied",
+    "createdAt": "2026-10-11T09:14:34.010Z"
+  }
+]

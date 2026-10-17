@@ -130,7 +130,7 @@ function estimateShirtValue({ player, signature, matchUsedType, importance, base
   // Special rule: Messi's iconic 2017 Barca vs Madrid home shirt worth 400k only when exact phrase entered
   const momentPhrase = (match || '').toLowerCase();
   const isExactMoment = momentPhrase.includes('barca vs madrid classic') && momentPhrase.includes('messi shirt');
-  if (player === 'Lionel Messi' && signature === 'Match used' && season && season.startsWith('2017') && isExactMoment) {
+  if (player === 'Lionel Messi' && signature === 'Match used' && season && season.startsWith('2017') && kit.toLowerCase().includes('home') && isExactMoment) {
     return 400000;
   }
   if (signature !== 'Match used') {
