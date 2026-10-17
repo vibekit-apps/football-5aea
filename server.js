@@ -159,9 +159,14 @@ function makeIconicArchive() {
     ['Zlatan Ibrahimović','Paris Saint-Germain','Ligue 1',2012,2016],['Thiago Silva','Paris Saint-Germain','Ligue 1',2012,2020],['David Ginola','Paris Saint-Germain','Ligue 1',1992,1995]
   ];
   const clubs = new Map();
-  for (const [player, team, league, from, to] of careers) for (let year = from; year < to; year++) {
-    const key = `${league}|${team}`; if (!clubs.has(key)) clubs.set(key, { league, team, shirts: [] });
-    for (const kit of ['Home shirt','Away shirt','Third shirt']) clubs.get(key).shirts.push({ id: `icon-${player}-${team}-${year}-${kit}`.replace(/[^a-z0-9]+/gi, '-').toLowerCase(), player, kit, season: `${year}/${String(year + 1).slice(-2)}` });
+  for (const [player, team, league, from, to] of careers) {
+    const start = Math.max(from, 1980);
+    const end = Math.min(to, 2024);
+    if (start >= end) continue;
+    for (let year = start; year < end; year++) {
+      const key = `${league}|${team}`; if (!clubs.has(key)) clubs.set(key, { league, team, shirts: [] });
+      for (const kit of ['Home shirt','Away shirt','Third shirt']) clubs.get(key).shirts.push({ id: `icon-${player}-${team}-${year}-${kit}`.replace(/[^a-z0-9]+/gi, '-').toLowerCase(), player, kit, season: `${year}/${String(year + 1).slice(-2)}` });
+    }
   }
   return [...clubs.values()];
 }

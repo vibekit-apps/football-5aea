@@ -1,4 +1,4 @@
-# TOOLS.md — football-5aea
+# TOOLS.md — footbal-kit-collector
 
 > Only the part of this file ABOVE the "INJECTED CONTEXT ENDS" marker reaches
 > your context automatically. Everything below it is on disk in this same file
@@ -934,7 +934,7 @@ curl -s -X POST "$VIBEKIT_API_URL/api/v1/hosting/app/$VIBEKIT_APP_ID/deps" \
   asked for): the `screenshot` tool on the live URL. It is the web version of the same code. The camera, haptics,
   notifications and anything else phone-only can only be checked by the user
   in Expo Go, so say that instead of claiming it works.
-- **The phone:** the user opens https://vibekit.bot/expo-go/football-5aea, which
+- **The phone:** the user opens https://vibekit.bot/expo-go/footbal-kit-collector, which
   opens the app in the free Expo Go app and helps them install it. After every
   deploy the phone gets the new version when they close and reopen it in Expo
   Go: tell them that, never "refresh".
