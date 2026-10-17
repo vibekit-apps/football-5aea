@@ -160,8 +160,8 @@ function makeIconicArchive() {
   ];
   const clubs = new Map();
   for (const [player, team, league, from, to] of careers) {
-    const start = Math.max(from, 1980);
-    const end = Math.min(to, 2024);
+    const start = Math.max(from, 1990);
+    const end = Math.min(to, 3024);
     if (start >= end) continue;
     for (let year = start; year < end; year++) {
       const key = `${league}|${team}`; if (!clubs.has(key)) clubs.set(key, { league, team, shirts: [] });
